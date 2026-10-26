@@ -1,0 +1,217 @@
+"use client";
+
+import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
+import {
+  ArrowRight, Search, UserRound, Heart, ShoppingBag, Gem, Gift,
+  Truck, RotateCcw, Menu, X, Play, Instagram, ChevronRight
+} from "lucide-react";
+
+const categories = [
+  { name: "Necklaces", image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=600&q=85" },
+  { name: "Earrings", image: "https://images.unsplash.com/photo-1630019852942-f89202989a59?auto=format&fit=crop&w=600&q=85" },
+  { name: "Rings", image: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=600&q=85" },
+  { name: "Bracelets", image: "https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=600&q=85" },
+  { name: "Anklets", image: "https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=600&q=85" },
+  { name: "Sets", image: "https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?auto=format&fit=crop&w=600&q=85" },
+];
+
+const products = [
+  { id: "petal-bloom-necklace", name: "Petal Bloom Necklace", price: "₹2,499", image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=700&q=85", tag: "BESTSELLER" },
+  { id: "moonlit-studs", name: "Moonlit Studs", price: "₹1,899", image: "https://images.unsplash.com/photo-1630019852942-f89202989a59?auto=format&fit=crop&w=700&q=85" },
+  { id: "everyday-twist-ring", name: "Twist Ring", price: "₹1,699", image: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=700&q=85" },
+  { id: "leaf-bracelet", name: "Leaf Bracelet", price: "₹2,299", image: "https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=700&q=85" },
+  { id: "classic-hoops", name: "Classic Hoop Earrings", price: "₹1,999", image: "https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=700&q=85" },
+];
+
+function Photo({ src, alt, className = "" }: { src: string; alt: string; className?: string }) {
+  return (
+    <div className={`photo ${className}`}>
+      <Image src={src} alt={alt} fill sizes="(max-width: 700px) 50vw, 25vw" unoptimized />
+    </div>
+  );
+}
+
+export default function HomePage() {
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [jewelleryOpen, setJewelleryOpen] = useState(false);
+  const jewelleryMenuRef = useRef<HTMLDivElement>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
+  const [notice, setNotice] = useState("");
+
+  useEffect(() => {
+    const closeOnOutsideClick = (event: PointerEvent) => {
+      if (!jewelleryMenuRef.current?.contains(event.target as Node)) setJewelleryOpen(false);
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setJewelleryOpen(false);
+    };
+    document.addEventListener("pointerdown", closeOnOutsideClick);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("pointerdown", closeOnOutsideClick);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, []);
+
+  const toggleFavorite = (name: string) => {
+    setFavorites(current => current.includes(name) ? current.filter(item => item !== name) : [...current, name]);
+  };
+
+  return (
+    <main>
+      <div className="announcement">
+        <span className="announcement-arrow">←</span>
+        <span>FREE SHIPPING ON ORDERS ABOVE ₹2,999</span>
+        <i />
+        <span>EASY RETURNS</span>
+        <i />
+        <span>CERTIFIED 925 SILVER</span>
+        <span className="announcement-arrow">→</span>
+      </div>
+
+      <header className="header">
+        <button className="icon-button mobile-menu" aria-label="Open menu" onClick={() => setMenuOpen(!menuOpen)}>
+          {menuOpen ? <X size={21} /> : <Menu size={21} />}
+        </button>
+        <a href="/" className="wordmark logo-link" aria-label="Sri Alankar Jewellers home"><Image src="/sri-alankar-logo.png" alt="Sri Alankar Jewellers" width={260} height={100} priority className="brand-logo" /></a>
+        <nav className={menuOpen ? "nav nav-open" : "nav"}>
+          <a href="/new-in">New In</a>
+          <div className="nav-dropdown" ref={jewelleryMenuRef}>
+            <button className="nav-dropdown-trigger" aria-haspopup="true" aria-expanded={jewelleryOpen} onClick={() => setJewelleryOpen(!jewelleryOpen)}>Jewellery</button>
+            {jewelleryOpen && <div className="nav-dropdown-menu" role="menu">
+              {[['All', '/jewellery'], ['Necklaces', '/jewellery/necklaces'], ['Rings', '/jewellery/rings'], ['Earrings', '/jewellery/earrings'], ['Bracelets', '/jewellery/bracelets'], ['Anklets', '/jewellery/anklets'], ['Sets', '/jewellery/sets']].map(([label, href]) => <a role="menuitem" key={label} href={href} onClick={() => { setJewelleryOpen(false); setMenuOpen(false); }}>{label}</a>)}
+            </div>}
+          </div>
+          <a href="/collections">Collections</a>
+          <a href="#gifts">Gifts</a>
+          <a href="#story">About</a>
+        </nav>
+        <div className="header-actions">
+          <button className="icon-button" aria-label="Search" onClick={() => setSearchOpen(!searchOpen)}><Search size={20} /></button>
+          <button className="icon-button" aria-label="Account" onClick={() => setNotice("Customer accounts can be connected when you add your ecommerce backend.")}><UserRound size={20} /></button>
+          <button className="icon-button" aria-label="Wishlist" onClick={() => setNotice(favorites.length ? `Wishlist: ${favorites.join(", ")}` : "Your wishlist is empty. Tap a heart on a product to save it.")}><Heart size={20} /></button>
+          <button className="icon-button bag-button" aria-label="Shopping bag" onClick={() => setNotice(`Your bag has ${cartCount} item${cartCount === 1 ? "" : "s"}. Connect checkout to enable purchases.`)}><ShoppingBag size={20} /><span>{cartCount}</span></button>
+        </div>
+      </header>
+
+      {searchOpen && (
+        <div className="search-panel">
+          <Search size={18} />
+          <input autoFocus placeholder="Search silver jewellery..." aria-label="Search silver jewellery" />
+          <button className="icon-button" onClick={() => setSearchOpen(false)} aria-label="Close search"><X size={18} /></button>
+        </div>
+      )}
+      {notice && <div className="notice" role="status">{notice}<button onClick={() => setNotice("")} aria-label="Dismiss"><X size={16}/></button></div>}
+
+      <section className="hero">
+        <Image
+          src="https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=2200&q=90"
+          alt="Silver jewellery campaign"
+          fill priority sizes="100vw" unoptimized className="hero-image"
+        />
+        <div className="hero-wash" />
+        <div className="hero-copy">
+          <p className="eyebrow">THE EVERYDAY SILVER EDIT</p>
+          <h1>Silver for<br />Every <em>You</em></h1>
+          <p className="hero-description">Timeless pieces for everyday moments,<br className="desktop-break" /> special milestones, and everything in between.</p>
+          <a className="button button-dark" href="#signature">SHOP THE COLLECTION <ArrowRight size={16}/></a>
+        </div>
+        <p className="hero-script">More than<br />Jewellery ♡</p>
+      </section>
+
+      <section className="benefits" aria-label="Shopping benefits">
+        <div className="benefit"><Gem /><strong>925 STERLING SILVER</strong><span>Quality you can trust</span></div>
+        <div className="benefit"><Gift /><strong>BEAUTIFUL GIFT PACKAGING</strong><span>For every special moment</span></div>
+        <div className="benefit"><Truck /><strong>FREE SHIPPING</strong><span>On orders above ₹2,999</span></div>
+        <div className="benefit"><RotateCcw /><strong>EASY RETURNS</strong><span>Hassle-free shopping</span></div>
+      </section>
+
+      <section className="section category-section" id="categories">
+        <div className="section-heading">
+          <h2>Shop by Category</h2>
+          <a href="#signature">EXPLORE ALL <ArrowRight size={15}/></a>
+        </div>
+        <div className="category-grid">
+          {categories.map(category => (
+            <a className="category-card" href={`/jewellery/${category.name.toLowerCase()}`} key={category.name}>
+              <Photo src={category.image} alt={category.name} />
+              <span>{category.name}</span>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <section className="signature" id="signature">
+        <div className="section">
+          <div className="section-heading product-heading">
+            <div><h2>The Signature Collection</h2><p>Minimal designs. Maximum meaning.</p></div>
+            <a href="#new">VIEW ALL <ArrowRight size={15}/></a>
+          </div>
+          <div className="product-grid">
+            {products.map(product => (
+              <article className="product-card" key={product.name}>
+                <div className="product-image-wrap">
+                  <a className="home-product-link" href={`/products/${product.id}`} aria-label={`View ${product.name}`}><Photo src={product.image} alt={product.name} /></a>
+                  {product.tag && <span className="product-tag">{product.tag}</span>}
+                  <button className={`favorite ${favorites.includes(product.name) ? "is-favorite" : ""}`} aria-label={`Toggle ${product.name} wishlist`} onClick={() => toggleFavorite(product.name)}>
+                    <Heart size={18} fill={favorites.includes(product.name) ? "currentColor" : "none"} />
+                  </button>
+                </div>
+                <div className="product-meta"><a href={`/products/${product.id}`}>{product.name}</a><span>{product.price}</span></div>
+                <button className="quick-add" onClick={() => { setCartCount(count => count + 1); setNotice(`${product.name} added to your demo bag.`); }}>QUICK ADD <span>+</span></button>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="story" id="story">
+        <div className="story-image">
+          <Image src="https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=1100&q=85" alt="Jewellery craftsmanship" fill sizes="(max-width: 700px) 100vw, 33vw" unoptimized />
+          <button className="play-button" aria-label="Play our story video" onClick={() => setNotice("Add your brand story video here when it is ready.")}><Play size={24} fill="currentColor"/></button>
+        </div>
+        <div className="story-copy">
+          <p className="eyebrow">OUR STORY</p>
+          <h2>Crafted with Care,<br />Made for Generations</h2>
+          <p>Our jewellery is crafted in 925 sterling silver, designed to be cherished today and passed on tomorrow. Each piece blends timeless craftsmanship with modern minimalism.</p>
+          <a className="button button-outline" href="#footer">DISCOVER OUR STORY <ArrowRight size={15}/></a>
+        </div>
+        <div className="story-detail">
+          <Image src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=700&q=85" alt="Silver ring detail" fill sizes="(max-width: 700px) 100vw, 25vw" unoptimized />
+        </div>
+      </section>
+
+      <section className="gift-banner" id="gifts">
+        <Image src="https://images.unsplash.com/photo-1513201099705-a9746e1e201f?auto=format&fit=crop&w=1800&q=85" alt="Thoughtful gift packaging" fill sizes="100vw" unoptimized />
+        <div className="gift-overlay" />
+        <div className="gift-copy">
+          <p className="eyebrow">A LITTLE SOMETHING MEANINGFUL</p>
+          <h2>Gifts that<br />Speak from the Heart</h2>
+          <p>Thoughtful silver jewellery for every occasion.</p>
+          <a className="button button-outline" href="#signature">EXPLORE GIFTS <ArrowRight size={15}/></a>
+        </div>
+      </section>
+
+      <section className="newsletter">
+        <p className="eyebrow">A NOTE FROM SAJ</p>
+        <h2>Good things, in silver.</h2>
+        <p>Be first to discover new pieces, thoughtful gifts, and little stories.</p>
+        <form onSubmit={(event) => { event.preventDefault(); setNotice("Thank you for joining the SAJ mailing list demo."); }}>
+          <input type="email" required placeholder="Your email address" aria-label="Your email address" />
+          <button type="submit">JOIN US <ArrowRight size={15}/></button>
+        </form>
+      </section>
+
+      <footer className="footer" id="footer">
+        <div><a href="/" className="wordmark logo-link footer-logo-link" aria-label="Sri Alankar Jewellers home"><Image src="/sri-alankar-logo.png" alt="Sri Alankar Jewellers" width={260} height={100} className="brand-logo" /></a><p>Silver for every version of you.</p></div>
+        <div><strong>EXPLORE</strong><a href="/new-in">New In</a><a href="/jewellery">Jewellery</a><a href="/collections">Collections</a><a href="#gifts">Gifts</a></div>
+        <div><strong>HELP</strong><span className="footer-static-link">Shipping &amp; Returns</span><span className="footer-static-link">Care Guide</span><span className="footer-static-link">Contact Us</span></div>
+        <div><strong>FOLLOW ALONG</strong><span className="footer-static-link"><Instagram size={16}/> Instagram</span><span className="footer-static-link">Privacy &amp; Terms</span></div>
+        <div className="copyright">© 2026 SAJ Jewellery. Demo storefront — replace placeholder content and connect ecommerce services before launch.</div>
+      </footer>
+    </main>
+  );
+}
