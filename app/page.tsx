@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useShop } from "@/components/ShopProvider";
+import { products as catalogProducts, formatPrice } from "@/data/products";
 import {
   ArrowRight, Search, UserRound, Heart, ShoppingBag, Gem, Gift,
   Truck, RotateCcw, Menu, X, Play, Instagram, ChevronRight
@@ -18,13 +19,7 @@ const categories = [
   { name: "Sets", image: "https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?auto=format&fit=crop&w=600&q=85" },
 ];
 
-const products = [
-  { id: "petal-bloom-necklace", name: "Petal Bloom Necklace", price: "₹2,499", image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=700&q=85", tag: "BESTSELLER" },
-  { id: "moonlit-studs", name: "Moonlit Studs", price: "₹1,899", image: "https://images.unsplash.com/photo-1630019852942-f89202989a59?auto=format&fit=crop&w=700&q=85" },
-  { id: "everyday-twist-ring", name: "Twist Ring", price: "₹1,699", image: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=700&q=85" },
-  { id: "leaf-bracelet", name: "Leaf Bracelet", price: "₹2,299", image: "https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=700&q=85" },
-  { id: "classic-hoops", name: "Classic Hoop Earrings", price: "₹1,999", image: "https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=700&q=85" },
-];
+const products = catalogProducts.slice(0, 5);
 
 function Photo({ src, alt, className = "" }: { src: string; alt: string; className?: string }) {
   return (
@@ -76,6 +71,7 @@ export default function HomePage() {
         </button>
         <a href="/" className="wordmark logo-link" aria-label="Sri Alankar Jewellers home"><Image src="/sri-alankar-logo.png" alt="Sri Alankar Jewellers" width={260} height={100} priority className="brand-logo" /></a>
         <nav className={menuOpen ? "nav nav-open" : "nav"}>
+          <a href="/" onClick={() => setMenuOpen(false)}>Home</a>
           <a href="/new-in">New In</a>
           <div className="nav-dropdown" ref={jewelleryMenuRef}>
             <button className="nav-dropdown-trigger" aria-haspopup="true" aria-expanded={jewelleryOpen} onClick={() => setJewelleryOpen(!jewelleryOpen)}>Jewellery</button>
@@ -84,8 +80,8 @@ export default function HomePage() {
             </div>}
           </div>
           <a href="/collections">Collections</a>
-          <a href="#gifts">Gifts</a>
-          <a href="#story">About</a>
+          <a href="/gifts">Gifts</a>
+          <a href="/about">About</a>
         </nav>
         <div className="header-actions">
           <button className="icon-button" aria-label="Search" onClick={() => setSearchOpen(!searchOpen)}><Search size={20} /></button>
@@ -154,12 +150,12 @@ export default function HomePage() {
               <article className="product-card" key={product.name}>
                 <div className="product-image-wrap">
                   <a className="home-product-link" href={`/products/${product.id}`} aria-label={`View ${product.name}`}><Photo src={product.image} alt={product.name} /></a>
-                  {product.tag && <span className="product-tag">{product.tag}</span>}
+                  {product.isBestseller && <span className="product-tag">BESTSELLER</span>}
                   <button className={`favorite ${wishlist.includes(product.id) ? "is-favorite" : ""}`} aria-label={`Toggle ${product.name} wishlist`} aria-pressed={wishlist.includes(product.id)} onClick={() => toggleWishlist(product.id)}>
                     <Heart size={18} fill={wishlist.includes(product.id) ? "currentColor" : "none"} />
                   </button>
                 </div>
-                <div className="product-meta"><a href={`/products/${product.id}`}>{product.name}</a><span>{product.price}</span></div>
+                <div className="product-meta"><a href={`/products/${product.id}`}>{product.name}</a><span>{formatPrice(product.price)}</span></div>
                 <button className="quick-add" onClick={() => { addToCart(product.id); setNotice(`${product.name} added to your bag.`); }}>QUICK ADD <span>+</span></button>
               </article>
             ))}
@@ -190,15 +186,15 @@ export default function HomePage() {
           <p className="eyebrow">A LITTLE SOMETHING MEANINGFUL</p>
           <h2>Gifts that<br />Speak from the Heart</h2>
           <p>Thoughtful silver jewellery for every occasion.</p>
-          <a className="button button-outline" href="#signature">EXPLORE GIFTS <ArrowRight size={15}/></a>
+          <a className="button button-outline" href="/gifts">EXPLORE GIFTS <ArrowRight size={15}/></a>
         </div>
       </section>
 
       <section className="newsletter">
-        <p className="eyebrow">A NOTE FROM SAJ</p>
+        <p className="eyebrow">A NOTE FROM SRI ALANKAR JEWELLERS</p>
         <h2>Good things, in silver.</h2>
         <p>Be first to discover new pieces, thoughtful gifts, and little stories.</p>
-        <form onSubmit={(event) => { event.preventDefault(); setNotice("Thank you for joining the SAJ mailing list demo."); }}>
+        <form onSubmit={(event) => { event.preventDefault(); setNotice("Thank you for joining the Sri Alankar Jewellers mailing list demo."); }}>
           <input type="email" required placeholder="Your email address" aria-label="Your email address" />
           <button type="submit">JOIN US <ArrowRight size={15}/></button>
         </form>
@@ -206,10 +202,10 @@ export default function HomePage() {
 
       <footer className="footer" id="footer">
         <div><a href="/" className="wordmark logo-link footer-logo-link" aria-label="Sri Alankar Jewellers home"><Image src="/sri-alankar-logo.png" alt="Sri Alankar Jewellers" width={260} height={100} className="brand-logo" /></a><p>Silver for every version of you.</p></div>
-        <div><strong>EXPLORE</strong><a href="/new-in">New In</a><a href="/jewellery">Jewellery</a><a href="/collections">Collections</a><a href="#gifts">Gifts</a></div>
+        <div><strong>EXPLORE</strong><a href="/new-in">New In</a><a href="/jewellery">Jewellery</a><a href="/collections">Collections</a><a href="/gifts">Gifts</a></div>
         <div><strong>HELP</strong><span className="footer-static-link">Shipping &amp; Returns</span><span className="footer-static-link">Care Guide</span><span className="footer-static-link">Contact Us</span></div>
         <div><strong>FOLLOW ALONG</strong><span className="footer-static-link"><Instagram size={16}/> Instagram</span><span className="footer-static-link">Privacy &amp; Terms</span></div>
-        <div className="copyright">© 2026 SAJ Jewellery. Demo storefront — replace placeholder content and connect ecommerce services before launch.</div>
+        <div className="copyright">© 2026 Sri Alankar Jewellers. Demo storefront — replace placeholder content and connect ecommerce services before launch.</div>
       </footer>
     </main>
   );

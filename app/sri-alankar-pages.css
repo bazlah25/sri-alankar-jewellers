@@ -361,6 +361,112 @@
 .sa-checkout-success { max-width: 520px; min-height: 310px; margin: 0 auto; padding: 40px 20px 65px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
 .sa-checkout-success h2 { margin: 0; color: #302820; font: 400 38px "Playfair Display",Georgia,serif; }
 .sa-checkout-success p { max-width: 420px; margin: 12px 0 24px; color: #71675d; font-size: 12px; line-height: 1.7; }
+.sa-about-hero { position: relative; min-height: 470px; height: clamp(470px,54vw,700px); overflow: hidden; background: #ded1c4; }
+.sa-about-hero > img { object-fit: cover; object-position: center 48%; }
+.sa-about-hero-wash { position: absolute; inset: 0; background: linear-gradient(90deg,rgba(244,233,220,.95) 0%,rgba(244,233,220,.82) 34%,rgba(244,233,220,.08) 72%); }
+.sa-about-hero-copy { position: absolute; left: 10%; top: 50%; transform: translateY(-50%); max-width: 470px; }
+.sa-about-hero-copy h1 { margin: 0 0 17px; color: #302820; font: 400 clamp(48px,6.4vw,84px)/.98 "Playfair Display",Georgia,serif; letter-spacing: -2px; }
+.sa-about-hero-copy h1 em { font-weight: 400; }
+.sa-about-hero-copy > p { max-width: 340px; margin: 0 0 24px; color: #55483d; font-size: 14px; line-height: 1.7; }
+.sa-about-intro { max-width: 790px; margin: 0 auto; padding: 90px 25px; text-align: center; }
+.sa-about-intro h2,.sa-about-story-copy h2,.sa-about-values-heading h2,.sa-about-materials h2,.sa-about-cta h2 { margin: 0; color: #302820; font: 400 clamp(32px,4vw,48px)/1.08 "Playfair Display",Georgia,serif; letter-spacing: -1px; }
+.sa-about-intro > p { max-width: 670px; margin: 18px auto 0; color: #71675d; font-size: 13px; line-height: 1.9; }
+.sa-about-story { display: grid; grid-template-columns: 1fr 1fr; min-height: 500px; background: #f3ede5; }
+.sa-about-story-image { position: relative; min-height: 500px; overflow: hidden; }
+.sa-about-story-image img { object-fit: cover; }
+.sa-about-story-copy { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: clamp(40px,8vw,105px); }
+.sa-about-story-copy h2 { margin-bottom: 18px; }
+.sa-about-story-copy p { max-width: 480px; margin: 0 0 13px; color: #71675d; font-size: 12px; line-height: 1.9; }
+.sa-about-text-link { display: inline-flex; align-items: center; gap: 9px; margin-top: 12px; color: #65513f; font-size: 9px; letter-spacing: 1.1px; }
+.sa-about-text-link:hover { color: #302820; }
+.sa-about-values { padding: 82px 8%; }
+.sa-about-values-heading { text-align: center; margin-bottom: 38px; }
+.sa-about-value-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 30px; }
+.sa-about-value-grid article { padding: 27px 23px; border-top: 1px solid #d9cfc4; text-align: center; }
+.sa-about-value-grid svg { color: #806b58; stroke-width: 1.3; }
+.sa-about-value-grid h3 { margin: 14px 0 9px; color: #302820; font: 400 20px "Playfair Display",Georgia,serif; }
+.sa-about-value-grid p { max-width: 290px; margin: 0 auto; color: #71675d; font-size: 11px; line-height: 1.8; }
+.sa-about-materials { display: grid; grid-template-columns: 1fr 1fr; min-height: 490px; background: #e9dfd4; }
+.sa-about-materials > div { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: clamp(40px,8vw,100px); }
+.sa-about-materials h2 { max-width: 400px; }
+.sa-about-materials p { max-width: 430px; margin: 18px 0 12px; color: #71675d; font-size: 12px; line-height: 1.9; }
+.sa-about-materials > img { width: 100%; height: 100%; min-height: 490px; object-fit: cover; }
+.sa-about-cta { padding: 78px 20px 86px; background: #fcfaf7; text-align: center; }
+.sa-about-cta h2 { margin: 0 auto 24px; }
+.sa-gifts-hero { position: relative; height: clamp(430px,49vw,640px); overflow: hidden; background: #e0d1c1; }
+.sa-gifts-hero > img { object-fit: cover; object-position: center 53%; }
+.sa-gifts-hero-wash { position: absolute; inset: 0; background: linear-gradient(90deg,rgba(244,233,220,.94) 0%,rgba(244,233,220,.8) 36%,rgba(244,233,220,.08) 75%); }
+.sa-gifts-hero-copy { position: absolute; left: 9%; top: 50%; transform: translateY(-50%); max-width: 510px; }
+.sa-gifts-hero-copy h1 { margin: 0 0 17px; color: #302820; font: 400 clamp(44px,5.8vw,78px)/.98 "Playfair Display",Georgia,serif; letter-spacing: -1.8px; }
+.sa-gifts-hero-copy h1 em { font-weight: 400; }
+.sa-gifts-hero-copy > p { max-width: 380px; margin: 0 0 23px; color: #55483d; font-size: 13px; line-height: 1.75; }
+.sa-gifts-intro { max-width: 760px; margin: 0 auto; padding: 66px 25px 58px; text-align: center; }
+.sa-gifts-intro h2 { margin: 0; color: #302820; font: 400 clamp(30px,3.5vw,43px)/1.1 "Playfair Display",Georgia,serif; letter-spacing: -1px; }
+.sa-gifts-intro p { max-width: 640px; margin: 14px auto 0; color: #71675d; font-size: 12px; line-height: 1.85; }
+.sa-gift-promises { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); padding: 25px 7%; background: #f3ede5; }
+.sa-gift-promises > div { min-height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border-right: 1px solid #dfd4c8; }
+.sa-gift-promises > div:last-child { border: 0; }
+.sa-gift-promises svg { width: 20px; height: 20px; margin-bottom: 9px; color: #806b58; stroke-width: 1.3; }
+.sa-gift-promises strong { color: #51473e; font-size: 9px; letter-spacing: 1px; font-weight: 500; }
+.sa-gift-promises span { margin-top: 5px; color: #817568; font-size: 9px; }
+.sa-gift-category-section { padding: 58px 5% 66px; }
+.sa-gift-category-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 18px; }
+.sa-gift-category-card { min-width: 0; }
+.sa-gift-category-card > div { position: relative; aspect-ratio: 1.12; overflow: hidden; background: #e9dfd4; }
+.sa-gift-category-card img { object-fit: cover; transition: transform .4s; }
+.sa-gift-category-card:hover img { transform: scale(1.035); }
+.sa-gift-category-arrow { position: absolute; right: 13px; bottom: 13px; width: 34px; height: 34px; display: grid; place-items: center; background: #fcfaf7; color: #51473e; }
+.sa-gift-category-card h3 { margin: 12px 0 4px; color: #302820; font: 400 21px "Playfair Display",Georgia,serif; }
+.sa-gift-category-card p { margin: 0; color: #817568; font-size: 10px; }
+.sa-gifts-catalog { padding: 55px 5% 70px; background: #f3ede5; scroll-margin-top: 20px; }
+.sa-gifts-catalog .sa-section-heading { margin-bottom: 23px; }
+.sa-gifts-catalog .sa-section-heading > div > p { max-width: 440px; }
+.sa-gift-budget-filter { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 18px; }
+.sa-gift-budget-filter button { min-height: 35px; padding: 0 16px; border: 1px solid #d5c9bc; border-radius: 20px; background: transparent; color: #65584c; font-size: 10px; cursor: pointer; transition: background .2s,color .2s,border-color .2s; }
+.sa-gift-budget-filter button:hover,.sa-gift-budget-filter button.active { border-color: #65513f; background: #65513f; color: #fff; }
+.sa-gift-results-heading { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 15px; color: #817568; font-size: 9px; }
+.sa-gifts-catalog .sa-product-photo { background: #e8ded3; }
+.sa-gifts-note { display: flex; flex-direction: column; align-items: center; padding: 68px 20px 74px; background: #fcfaf7; text-align: center; }
+.sa-gifts-note > p { margin: 0 0 11px; color: #302820; font: italic 25px "Playfair Display",Georgia,serif; }
+.sa-gifts-note .sa-button { margin-top: 14px; }
+@media (max-width: 700px) {
+  .sa-about-hero { min-height: 470px; height: 72vh; max-height: 610px; }
+  .sa-about-hero > img { object-position: 60% center; }
+  .sa-about-hero-wash { background: linear-gradient(90deg,rgba(244,233,220,.92),rgba(244,233,220,.68) 58%,rgba(244,233,220,.12)); }
+  .sa-about-hero-copy { left: 6%; right: 5%; }
+  .sa-about-hero-copy h1 { font-size: 55px; }
+  .sa-about-hero-copy > p { font-size: 12px; }
+  .sa-about-intro { padding: 60px 7%; }
+  .sa-about-story { grid-template-columns: 1fr; }
+  .sa-about-story-image { min-height: 360px; }
+  .sa-about-story-copy { padding: 45px 7%; }
+  .sa-about-values { padding: 58px 6%; }
+  .sa-about-values-heading { margin-bottom: 20px; }
+  .sa-about-value-grid { grid-template-columns: 1fr; gap: 5px; }
+  .sa-about-value-grid article { padding: 22px 8px; }
+  .sa-about-materials { grid-template-columns: 1fr; }
+  .sa-about-materials > div { padding: 48px 7%; }
+  .sa-about-materials > img { min-height: 360px; max-height: 470px; }
+  .sa-about-cta { padding: 60px 6%; }
+  .sa-gifts-hero { height: 560px; }
+  .sa-gifts-hero > img { object-position: 59% center; }
+  .sa-gifts-hero-wash { background: linear-gradient(90deg,rgba(244,233,220,.92),rgba(244,233,220,.72) 60%,rgba(244,233,220,.15)); }
+  .sa-gifts-hero-copy { left: 6%; right: 5%; }
+  .sa-gifts-hero-copy h1 { font-size: 49px; }
+  .sa-gifts-intro { padding: 48px 7% 42px; }
+  .sa-gift-promises { grid-template-columns: 1fr; padding: 10px 7%; }
+  .sa-gift-promises > div { min-height: 92px; border-right: 0; border-bottom: 1px solid #dfd4c8; }
+  .sa-gift-promises > div:last-child { border-bottom: 0; }
+  .sa-gift-category-section { padding: 42px 4% 48px; }
+  .sa-gift-category-grid { grid-template-columns: 1fr; gap: 22px; }
+  .sa-gift-category-card > div { aspect-ratio: 1.15; }
+  .sa-gifts-catalog { padding: 42px 4% 50px; }
+  .sa-gift-budget-filter { gap: 7px; }
+  .sa-gift-budget-filter button { padding: 0 12px; font-size: 9px; }
+  .sa-gift-results-heading { flex-direction: column; gap: 4px; }
+  .sa-gifts-note { padding: 52px 7%; }
+  .sa-gifts-note > p { font-size: 21px; }
+}
 @media (max-width: 700px) {
   .sa-basket-heading { padding: 34px 4% 18px; }
   .sa-basket-layout { grid-template-columns: 1fr; padding: 5px 4% 42px; gap: 28px; }

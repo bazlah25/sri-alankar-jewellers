@@ -3,7 +3,7 @@ import "./globals.css";
 import { ShopProvider } from "@/components/ShopProvider";
 
 export const metadata: Metadata = {
-  title: "SAJ — Silver for Every You",
+  title: "Sri Alankar Jewellers — Silver for Every You",
   description: "Timeless silver jewellery for everyday moments and special milestones.",
 };
 
