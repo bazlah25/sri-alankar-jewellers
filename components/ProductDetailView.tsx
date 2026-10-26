@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Heart, Minus, Plus, ShoppingBag } from "lucide-react";
 import type { Product } from "@/data/products";
 import { formatPrice } from "@/data/products";
+import { useShop } from "@/components/ShopProvider";
 
 const galleryByCategory: Record<Product["category"], string[]> = {
   Necklaces: ["photo-1599643478518-a784e5dc4c8f", "photo-1611652022419-a9419f74343d", "photo-1617038220319-276d3cfab638", "photo-1617038260897-41a1f14a8ca0"],
@@ -29,8 +30,9 @@ export default function ProductDetailView({ product }: { product: Product }) {
   gallery[0] = product.image;
   const [activeImage, setActiveImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [saved, setSaved] = useState(false);
   const [notice, setNotice] = useState("");
+  const { wishlist, toggleWishlist, addToCart } = useShop();
+  const saved = wishlist.includes(product.id);
   const [pincode, setPincode] = useState("");
   const [pincodeMessage, setPincodeMessage] = useState("");
   const [reviewName, setReviewName] = useState("");
@@ -64,7 +66,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
       <p className="sa-product-detail-price">{formatPrice(product.price)}</p>
       <p className="sa-product-detail-description">{descriptions[product.category]}</p>
       <p className="sa-product-material-detail">{product.material === "925 Sterling Silver" ? "925 Sterling Silver · Solid sterling silver" : "Silver plated"}</p>
-      <div className="sa-product-purchase-row"><div className="sa-quantity-control" aria-label="Quantity"><button type="button" aria-label="Decrease quantity" disabled={quantity <= 1} onClick={() => setQuantity(value => Math.max(1, value - 1))}><Minus size={14}/></button><span>{quantity}</span><button type="button" aria-label="Increase quantity" onClick={() => setQuantity(value => value + 1)}><Plus size={14}/></button></div><button type="button" className="sa-product-add" disabled={!product.available} onClick={() => setNotice(`${quantity} × ${product.name} added to your demo bag.`)}><ShoppingBag size={16}/>{product.available ? "ADD TO BAG" : "SOLD OUT"}</button><button type="button" className={`sa-product-wishlist ${saved ? "active" : ""}`} aria-label={saved ? "Remove from wishlist" : "Add to wishlist"} aria-pressed={saved} onClick={() => setSaved(!saved)}><Heart size={18} fill={saved ? "currentColor" : "none"}/></button></div>
+      <div className="sa-product-purchase-row"><div className="sa-quantity-control" aria-label="Quantity"><button type="button" aria-label="Decrease quantity" disabled={quantity <= 1} onClick={() => setQuantity(value => Math.max(1, value - 1))}><Minus size={14}/></button><span>{quantity}</span><button type="button" aria-label="Increase quantity" onClick={() => setQuantity(value => value + 1)}><Plus size={14}/></button></div><button type="button" className="sa-product-add" disabled={!product.available} onClick={() => { addToCart(product.id, quantity); setNotice(`${quantity} × ${product.name} added to your demo bag.`); }}><ShoppingBag size={16}/>{product.available ? "ADD TO BAG" : "SOLD OUT"}</button><button type="button" className={`sa-product-wishlist ${saved ? "active" : ""}`} aria-label={saved ? "Remove from wishlist" : "Add to wishlist"} aria-pressed={saved} onClick={() => toggleWishlist(product.id)}><Heart size={18} fill={saved ? "currentColor" : "none"}/></button></div>
       {notice && <p className="sa-product-notice" role="status">{notice}</p>}
       <form className="sa-pincode-check" onSubmit={checkPincode}>
         <label htmlFor="delivery-pincode">Check delivery availability</label>

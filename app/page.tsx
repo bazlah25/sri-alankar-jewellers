@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { useShop } from "@/components/ShopProvider";
 import {
   ArrowRight, Search, UserRound, Heart, ShoppingBag, Gem, Gift,
   Truck, RotateCcw, Menu, X, Play, Instagram, ChevronRight
@@ -33,12 +35,12 @@ function Photo({ src, alt, className = "" }: { src: string; alt: string; classNa
 }
 
 export default function HomePage() {
-  const [favorites, setFavorites] = useState<string[]>([]);
+  const { wishlist, toggleWishlist, cartCount, addToCart } = useShop();
   const [menuOpen, setMenuOpen] = useState(false);
   const [jewelleryOpen, setJewelleryOpen] = useState(false);
   const jewelleryMenuRef = useRef<HTMLDivElement>(null);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [cartCount, setCartCount] = useState(0);
+  const [search, setSearch] = useState("");
   const [notice, setNotice] = useState("");
 
   useEffect(() => {
@@ -55,10 +57,6 @@ export default function HomePage() {
       document.removeEventListener("keydown", closeOnEscape);
     };
   }, []);
-
-  const toggleFavorite = (name: string) => {
-    setFavorites(current => current.includes(name) ? current.filter(item => item !== name) : [...current, name]);
-  };
 
   return (
     <main>
@@ -92,17 +90,18 @@ export default function HomePage() {
         <div className="header-actions">
           <button className="icon-button" aria-label="Search" onClick={() => setSearchOpen(!searchOpen)}><Search size={20} /></button>
           <button className="icon-button" aria-label="Account" onClick={() => setNotice("Customer accounts can be connected when you add your ecommerce backend.")}><UserRound size={20} /></button>
-          <button className="icon-button" aria-label="Wishlist" onClick={() => setNotice(favorites.length ? `Wishlist: ${favorites.join(", ")}` : "Your wishlist is empty. Tap a heart on a product to save it.")}><Heart size={20} /></button>
-          <button className="icon-button bag-button" aria-label="Shopping bag" onClick={() => setNotice(`Your bag has ${cartCount} item${cartCount === 1 ? "" : "s"}. Connect checkout to enable purchases.`)}><ShoppingBag size={20} /><span>{cartCount}</span></button>
+          <Link className="icon-button count-link" aria-label={`Wishlist, ${wishlist.length} saved`} href="/wishlist"><Heart size={20}/>{wishlist.length > 0 && <span>{wishlist.length}</span>}</Link>
+          <Link className="icon-button bag-button count-link" aria-label={`Shopping bag, ${cartCount} items`} href="/cart"><ShoppingBag size={20}/><span>{cartCount}</span></Link>
         </div>
       </header>
 
       {searchOpen && (
-        <div className="search-panel">
+        <form className="search-panel" action="/search" method="get">
           <Search size={18} />
-          <input autoFocus placeholder="Search silver jewellery..." aria-label="Search silver jewellery" />
-          <button className="icon-button" onClick={() => setSearchOpen(false)} aria-label="Close search"><X size={18} /></button>
-        </div>
+          <input autoFocus name="q" value={search} onChange={event => setSearch(event.target.value)} placeholder="Search silver jewellery..." aria-label="Search silver jewellery" />
+          <button className="search-submit" type="submit">SEARCH</button>
+          <button className="icon-button" type="button" onClick={() => setSearchOpen(false)} aria-label="Close search"><X size={18} /></button>
+        </form>
       )}
       {notice && <div className="notice" role="status">{notice}<button onClick={() => setNotice("")} aria-label="Dismiss"><X size={16}/></button></div>}
 
@@ -156,12 +155,12 @@ export default function HomePage() {
                 <div className="product-image-wrap">
                   <a className="home-product-link" href={`/products/${product.id}`} aria-label={`View ${product.name}`}><Photo src={product.image} alt={product.name} /></a>
                   {product.tag && <span className="product-tag">{product.tag}</span>}
-                  <button className={`favorite ${favorites.includes(product.name) ? "is-favorite" : ""}`} aria-label={`Toggle ${product.name} wishlist`} onClick={() => toggleFavorite(product.name)}>
-                    <Heart size={18} fill={favorites.includes(product.name) ? "currentColor" : "none"} />
+                  <button className={`favorite ${wishlist.includes(product.id) ? "is-favorite" : ""}`} aria-label={`Toggle ${product.name} wishlist`} aria-pressed={wishlist.includes(product.id)} onClick={() => toggleWishlist(product.id)}>
+                    <Heart size={18} fill={wishlist.includes(product.id) ? "currentColor" : "none"} />
                   </button>
                 </div>
                 <div className="product-meta"><a href={`/products/${product.id}`}>{product.name}</a><span>{product.price}</span></div>
-                <button className="quick-add" onClick={() => { setCartCount(count => count + 1); setNotice(`${product.name} added to your demo bag.`); }}>QUICK ADD <span>+</span></button>
+                <button className="quick-add" onClick={() => { addToCart(product.id); setNotice(`${product.name} added to your bag.`); }}>QUICK ADD <span>+</span></button>
               </article>
             ))}
           </div>

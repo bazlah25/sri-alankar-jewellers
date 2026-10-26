@@ -27,8 +27,9 @@ const priceRanges = [
   { label: "Above ₹5,000", min: "5001", max: "" },
 ];
 
-export default function ProductFilters({ products, initialCategory = "All", initialSort = "Featured", showCategoryPills = true }: { products: Product[]; initialCategory?: string; initialSort?: string; showCategoryPills?: boolean }) {
+export default function ProductFilters({ products, initialCategory = "All", initialSort = "Featured", initialSearch = "", showCategoryPills = true }: { products: Product[]; initialCategory?: string; initialSort?: string; initialSearch?: string; showCategoryPills?: boolean }) {
   const [category, setCategory] = useState(categories.includes(initialCategory) ? initialCategory : "All");
+  const [search, setSearch] = useState(initialSearch.trim());
   const [style, setStyle] = useState("");
   const [material, setMaterial] = useState("");
   const [occasion, setOccasion] = useState("");
@@ -43,6 +44,7 @@ export default function ProductFilters({ products, initialCategory = "All", init
 
   const filtered = useMemo(() => {
     const result = products.filter(p =>
+      (!search || [p.name, p.category, p.material, p.style, ...p.occasions].join(" ").toLocaleLowerCase().includes(search.toLocaleLowerCase())) &&
       (category === "All" || p.category === category) &&
       (!style || (styleValues[style] || []).includes(p.style)) &&
       (!material || p.material === material) &&
@@ -58,7 +60,7 @@ export default function ProductFilters({ products, initialCategory = "All", init
       if (sort === "Popularity") return Number(Boolean(b.isBestseller)) - Number(Boolean(a.isBestseller));
       return 0;
     });
-  }, [products, category, style, material, occasion, availability, sort, minPrice, maxPrice]);
+  }, [products, search, category, style, material, occasion, availability, sort, minPrice, maxPrice]);
 
   const reset = () => { setCategory("All"); setStyle(""); setMaterial(""); setOccasion(""); setAvailability("All"); setMinPrice(""); setMaxPrice(""); setSelectedPriceRange(""); setSort("Featured"); };
   const selectPriceRange = (range: typeof priceRanges[number]) => {

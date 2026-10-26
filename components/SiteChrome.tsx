@@ -4,13 +4,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Search, UserRound, Heart, ShoppingBag, Menu, X, Instagram } from "lucide-react";
+import { useShop } from "@/components/ShopProvider";
 
 export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [jewelleryOpen, setJewelleryOpen] = useState(false);
   const jewelleryMenuRef = useRef<HTMLDivElement>(null);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [search, setSearch] = useState("");
   const [notice, setNotice] = useState("");
+  const { cartCount, wishlist } = useShop();
 
   useEffect(() => {
     const closeOnOutsideClick = (event: PointerEvent) => {
@@ -45,11 +48,11 @@ export function SiteHeader() {
       <div className="header-actions">
         <button className="icon-button" aria-label="Search" onClick={() => setSearchOpen(!searchOpen)}><Search size={20}/></button>
         <button className="icon-button" aria-label="Account" onClick={() => setNotice("Customer accounts can be connected when you add your ecommerce backend.")}><UserRound size={20}/></button>
-        <button className="icon-button" aria-label="Wishlist" onClick={() => setNotice("Wishlist is a demo feature on this storefront.")}><Heart size={20}/></button>
-        <button className="icon-button bag-button" aria-label="Shopping bag" onClick={() => setNotice("Checkout is a demo feature. Connect an ecommerce service to place orders.")}><ShoppingBag size={20}/><span>0</span></button>
+        <Link className="icon-button count-link" aria-label={`Wishlist, ${wishlist.length} saved`} href="/wishlist"><Heart size={20}/>{wishlist.length > 0 && <span>{wishlist.length}</span>}</Link>
+        <Link className="icon-button bag-button count-link" aria-label={`Shopping bag, ${cartCount} items`} href="/cart"><ShoppingBag size={20}/><span>{cartCount}</span></Link>
       </div>
     </header>
-    {searchOpen && <div className="search-panel"><Search size={18}/><input autoFocus placeholder="Search silver jewellery..." aria-label="Search silver jewellery" onKeyDown={event => { if (event.key === "Enter") window.location.href = `/jewellery?search=${encodeURIComponent(event.currentTarget.value)}`; }}/><button className="icon-button" onClick={() => setSearchOpen(false)} aria-label="Close search"><X size={18}/></button></div>}
+    {searchOpen && <form className="search-panel" action="/search" method="get"><Search size={18}/><input autoFocus name="q" value={search} onChange={event => setSearch(event.target.value)} placeholder="Search silver jewellery..." aria-label="Search silver jewellery"/><button className="search-submit" type="submit">SEARCH</button><button className="icon-button" type="button" onClick={() => setSearchOpen(false)} aria-label="Close search"><X size={18}/></button></form>}
     {notice && <div className="notice" role="status">{notice}<button onClick={() => setNotice("")} aria-label="Dismiss"><X size={16}/></button></div>}
   </>;
 }
@@ -57,7 +60,7 @@ export function SiteHeader() {
 export function SiteFooter() {
   return <footer className="footer" id="footer">
     <div><Link href="/" className="wordmark logo-link footer-logo-link" aria-label="Sri Alankar Jewellers home"><Image src="/sri-alankar-logo.png" alt="Sri Alankar Jewellers" width={260} height={100} className="brand-logo"/></Link><p>Silver Beyond Occasions</p></div>
-    <div><strong>EXPLORE</strong><Link href="/new-in">New In</Link><Link href="/jewellery">Jewellery</Link><Link href="/collections">Collections</Link><Link href="/collections/gifting-edit">Gifts</Link></div>
+    <div><strong>EXPLORE</strong><Link href="/new-in">New In</Link><Link href="/jewellery">Jewellery</Link><Link href="/collections">Collections</Link><Link href="/collections/gifting-edit">Gifts</Link><Link href="/wishlist">Wishlist</Link><Link href="/cart">Shopping bag</Link></div>
     <div><strong>HELP</strong><span className="footer-static-link">Shipping &amp; Returns</span><span className="footer-static-link">Care Guide</span><span className="footer-static-link">Contact Us</span></div>
     <div><strong>FOLLOW ALONG</strong><span className="footer-static-link"><Instagram size={16}/> Instagram</span><span className="footer-static-link">Privacy &amp; Terms</span></div>
     <div className="copyright">© 2026 Sri Alankar Jewellers. Demo storefront — checkout and inventory require a connected ecommerce service.</div>
