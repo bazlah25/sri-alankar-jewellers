@@ -12,7 +12,8 @@ export const metadata = {
 const giftCategories = [
   { name: "Necklaces", line: "A keepsake close to the heart", href: "/jewellery/necklaces", image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=800&q=85" },
   { name: "Earrings", line: "Little details, lasting delight", href: "/jewellery/earrings", image: "https://images.unsplash.com/photo-1630019852942-f89202989a59?auto=format&fit=crop&w=800&q=85" },
-  { name: "Jewellery sets", line: "A beautifully matched gesture", href: "/jewellery/sets", image: "https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?auto=format&fit=crop&w=800&q=85" },
+  { name: "Photo Frames", line: "A keepsake made to be treasured", href: "/jewellery/photo-frames", image: "/categories/photo-frames-category.jpg" },
+  { name: "Pooja Essentials", line: "A meaningful gift for special rituals", href: "/jewellery/pooja-essentials", image: "/categories/pooja-essentials-category.jpg" },
 ];
 
 export default function GiftsPage() {

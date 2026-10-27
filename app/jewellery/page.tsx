@@ -6,7 +6,7 @@ import { StorefrontHeroImage } from "@/components/StorefrontImages";
 
 export const metadata = {
   title: "Shop Jewellery | Sri Alankar Jewellers",
-  description: "Explore silver necklaces, earrings, rings, bracelets, anklets, and jewellery sets."
+  description: "Explore silver necklaces, earrings, rings, bracelets, photo frames, and pooja essentials."
 };
 
 export default async function JewelleryPage({ searchParams }: { searchParams: Promise<{ category?: string; sort?: string }> }) {

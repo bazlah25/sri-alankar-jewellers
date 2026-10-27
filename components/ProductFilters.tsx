@@ -5,7 +5,7 @@ import { SlidersHorizontal, X, ChevronDown } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
 import { useProductCatalog } from "@/components/ProductCatalogProvider";
 
-const categories = ["All", "Necklaces", "Earrings", "Rings", "Bracelets", "Anklets", "Sets"];
+const categories = ["All", "Necklaces", "Earrings", "Rings", "Bracelets", "Photo Frames", "Pooja Essentials"];
 const priceRanges = [
   { label: "Under ₹1,000", min: "", max: "999" },
   { label: "₹1,000 – ₹2,000", min: "1000", max: "2000" },

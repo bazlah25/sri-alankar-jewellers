@@ -25,7 +25,7 @@ function findAnchor(product: Product, face: Point[] | undefined, hand: Point[] |
     const left = face[234], right = face[454], chin = face[152];
     const faceWidth = distance(left, right) * width;
     const centerX = (left.x + right.x) / 2 * width;
-    if (product.category === "Necklaces" || product.category === "Sets") {
+    if (product.category === "Necklaces") {
       return { x: centerX, y: chin.y * height + faceWidth * .27, width: faceWidth * .9, angle: Math.atan2(right.y - left.y, right.x - left.x) };
     }
     return { x: centerX, y: (left.y + right.y) / 2 * height + faceWidth * .13, width: faceWidth * .82, angle: Math.atan2(right.y - left.y, right.x - left.x) };
@@ -149,7 +149,7 @@ export default function VirtualTryOnExperience({ product }: { product: Product }
     };
   }, [open, product]);
 
-  if (!product.tryOn || !product.tryOnModelUrl) return null;
+  if (!product.tryOn || !product.tryOnModelUrl || product.category === "Photo Frames" || product.category === "Pooja Essentials") return null;
   return <>
     <button className="sa-vto-button" type="button" onClick={() => { setError(""); setStatus("Starting your camera…"); setOpen(true); }}><ScanFace size={16}/> TRY IT ON</button>
     {open && <div className="sa-vto-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setOpen(false); }}><section className="sa-vto-dialog" role="dialog" aria-modal="true" aria-label={`Virtual try-on for ${product.name}`}><header><div><span className="sa-eyebrow">ON-DEVICE CAMERA TRY-ON</span><h2>{product.name}</h2></div><button type="button" aria-label="Close virtual try-on" onClick={() => setOpen(false)}><X size={18}/></button></header><p className="sa-vto-privacy">Camera tracking runs on this device. Your camera feed is not uploaded.</p><div className="sa-vto-stage"><video ref={videoRef} autoPlay muted playsInline/><canvas ref={canvasRef}/>{!error && <span>{status}</span>}</div>{error && <p className="sa-vto-error" role="alert">{error}</p>}<p className="sa-vto-hint">Center your {product.category === "Rings" || product.category === "Bracelets" ? "hand" : "face and neck"} in the camera view.</p></section></div>}

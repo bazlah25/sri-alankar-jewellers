@@ -41,7 +41,7 @@ export function SiteHeader() {
         <div className="nav-dropdown" ref={jewelleryMenuRef}>
           <button className="nav-dropdown-trigger" aria-haspopup="true" aria-expanded={jewelleryOpen} onClick={() => setJewelleryOpen(!jewelleryOpen)}>Jewellery</button>
           {jewelleryOpen && <div className="nav-dropdown-menu" role="menu">
-            {[['All', '/jewellery'], ['Necklace', '/jewellery/necklaces'], ['Earrings', '/jewellery/earrings'], ['Rings', '/jewellery/rings'], ['Bracelets', '/jewellery/bracelets'], ['Photo Frames', '/jewellery'], ['Pooja Essentials', '/jewellery']].map(([label, href]) => <Link role="menuitem" key={label} href={href} onClick={() => { setJewelleryOpen(false); setMenuOpen(false); }}>{label}</Link>)}
+            {[['All', '/jewellery'], ['Necklace', '/jewellery/necklaces'], ['Earrings', '/jewellery/earrings'], ['Rings', '/jewellery/rings'], ['Bracelets', '/jewellery/bracelets'], ['Photo Frames', '/jewellery/photo-frames'], ['Pooja Essentials', '/jewellery/pooja-essentials']].map(([label, href]) => <Link role="menuitem" key={label} href={href} onClick={() => { setJewelleryOpen(false); setMenuOpen(false); }}>{label}</Link>)}
           </div>}
         </div>
         <Link href="/collections" onClick={() => setMenuOpen(false)}>Collections</Link><Link href="/gifts" onClick={() => setMenuOpen(false)}>Gifts</Link><Link href="/about" onClick={() => setMenuOpen(false)}>About</Link>

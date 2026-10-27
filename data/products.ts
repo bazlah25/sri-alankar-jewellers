@@ -1,7 +1,7 @@
 export type Product = {
   id: string;
   name: string;
-  category: "Necklaces" | "Earrings" | "Rings" | "Bracelets" | "Anklets" | "Sets";
+  category: "Necklaces" | "Earrings" | "Rings" | "Bracelets" | "Photo Frames" | "Pooja Essentials";
   gender?: "Male" | "Female" | "Unisex";
   description?: string;
   ringSizes?: string[];
@@ -51,13 +51,13 @@ export const products: Product[] = [
     collectionSlugs: ["everyday-edit", "statement-edit", "timeless-collection"]
   },
   {
-    id: "silver-anklet", name: "Dainty Silver Anklet", category: "Anklets",
+    id: "silver-photo-frame", name: "Elegant Silver Photo Frame", category: "Photo Frames",
     price: 1499, material: "925 Sterling Silver", style: "Minimal", occasions: ["Everyday", "Gifting"],
     available: true, image: "https://images.unsplash.com/photo-1774978237834-237b7aa7bd6c?auto=format&fit=crop&w=900&q=85",
     collectionSlugs: ["everyday-edit", "gifting-edit"]
   },
   {
-    id: "silver-gift-set", name: "Petal Jewellery Set", category: "Sets",
+    id: "silver-pooja-essentials", name: "Silver Pooja Essentials", category: "Pooja Essentials",
     price: 3299, material: "925 Sterling Silver", style: "Floral", occasions: ["Celebration", "Gifting"],
     available: true, isNew: true, image: "https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?auto=format&fit=crop&w=900&q=85",
     collectionSlugs: ["celebration-edit", "gifting-edit", "silver-wardrobe"]

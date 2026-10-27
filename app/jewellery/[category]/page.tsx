@@ -20,13 +20,13 @@ const categoryPages = {
     name: "Bracelets",
     subtitle: "A little silver detail to stay close, wherever you go.",
   },
-  anklets: {
-    name: "Anklets",
-    subtitle: "Delicate silver finishing touches, made for your moments.",
+  "photo-frames": {
+    name: "Photo Frames",
+    subtitle: "Silver frames for the moments and people you want to keep close.",
   },
-  sets: {
-    name: "Sets",
-    subtitle: "Thoughtfully matched silver jewellery, ready to wear together.",
+  "pooja-essentials": {
+    name: "Pooja Essentials",
+    subtitle: "Silver essentials for meaningful rituals and celebrations.",
   },
 } as const;
 

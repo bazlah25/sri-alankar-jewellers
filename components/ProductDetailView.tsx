@@ -13,8 +13,8 @@ const descriptions: Record<Product["category"], string> = {
   Earrings: "Thoughtfully finished silver earrings made to feel effortless from day to evening.",
   Rings: "A timeless silver ring with a considered shape and an easy, comfortable feel.",
   Bracelets: "A delicate silver bracelet made to be worn on its own or layered with your favourites.",
-  Anklets: "A refined silver anklet that adds a subtle finishing touch to your look.",
-  Sets: "A coordinated silver jewellery set, thoughtfully matched and ready to wear together.",
+  "Photo Frames": "A silver photo frame made to keep a favourite memory close and beautifully displayed.",
+  "Pooja Essentials": "Silver pooja essentials, thoughtfully crafted for meaningful rituals and celebrations.",
 };
 
 export default function ProductDetailView({ product }: { product: Product }) {

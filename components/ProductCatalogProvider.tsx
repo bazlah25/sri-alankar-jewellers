@@ -14,7 +14,7 @@ type ProductCatalogState = {
 };
 
 const ProductCatalogContext = createContext<ProductCatalogState | null>(null);
-const categories: Product["category"][] = ["Necklaces", "Earrings", "Rings", "Bracelets", "Anklets", "Sets"];
+const categories: Product["category"][] = ["Necklaces", "Earrings", "Rings", "Bracelets", "Photo Frames", "Pooja Essentials"];
 
 function isProduct(value: unknown): value is Product {
   if (!value || typeof value !== "object") return false;

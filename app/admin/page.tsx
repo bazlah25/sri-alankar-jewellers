@@ -8,7 +8,7 @@ import { useProductCatalog } from "@/components/ProductCatalogProvider";
 import { formatPrice, type Product } from "@/data/products";
 import StorefrontImageSettings from "@/components/StorefrontImageSettings";
 
-const categories: Product["category"][] = ["Necklaces", "Earrings", "Rings", "Bracelets", "Anklets", "Sets"];
+const categories: Product["category"][] = ["Necklaces", "Earrings", "Rings", "Bracelets", "Photo Frames", "Pooja Essentials"];
 type StoreOrder = { id: string; created_at: string; status: string; payment_method: string; customer: { firstName: string; lastName: string; email: string; phone: string; address: string; addressLine2?: string; city: string; state: string; pincode: string }; items: { name: string; price: number; quantity: number; ring_size?: string }[]; total: number };
 
 function slugify(value: string) {

@@ -13,8 +13,8 @@ const fields = [
   { key: "category:earrings", title: "Earrings hero", note: "Earrings category banner." },
   { key: "category:rings", title: "Rings hero", note: "Rings category banner." },
   { key: "category:bracelets", title: "Bracelets hero", note: "Bracelets category banner." },
-  { key: "category:photo-frames", title: "Photo Frames category", note: "Shop by category image for photo frames." },
-  { key: "category:pooja-essentials", title: "Pooja Essentials category", note: "Shop by category image for pooja essentials." },
+  { key: "category:photo-frames", title: "Photo Frames hero", note: "Photo frames collection page banner." },
+  { key: "category:pooja-essentials", title: "Pooja Essentials hero", note: "Pooja essentials collection page banner." },
 ];
 const devices = [
   { key: "desktop" as const, title: "Desktop" },

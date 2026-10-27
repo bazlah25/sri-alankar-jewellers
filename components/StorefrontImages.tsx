@@ -33,14 +33,14 @@ export function useStorefrontImages() {
   return value;
 }
 
-export function StorefrontHeroImage({ imageKey, alt, priority = false, className = "", sizes = "100vw" }: {
-  imageKey: string; alt: string; priority?: boolean; className?: string; sizes?: string;
+export function StorefrontHeroImage({ imageKey, alt, fallbackSrc, priority = false, className = "", sizes = "100vw" }: {
+  imageKey: string; alt: string; fallbackSrc?: string; priority?: boolean; className?: string; sizes?: string;
 }) {
   const { images } = useStorefrontImages();
   const saved = images[imageKey];
   const desktop = typeof saved === "string" ? saved : saved?.desktop;
   const mobile = typeof saved === "string" ? saved : saved?.mobile;
-  const src = desktop || mobile;
+  const src = desktop || mobile || fallbackSrc;
   if (!src) return null;
   return <picture className={`sa-managed-hero-picture ${className}`}>
     {mobile && <source media="(max-width: 700px)" srcSet={mobile} />}
