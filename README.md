@@ -13,6 +13,7 @@ A responsive Next.js starter homepage inspired by the supplied jewellery website
 - Brand story and gift banner
 - Newsletter form demo
 - Responsive mobile layout
+- Optional on-device camera try-on for products with a hosted GLB model
 
 ## Requirements
 - Node.js 18.17 or newer
@@ -44,5 +45,6 @@ saj-silver-store/
 3. Confirm product materials and claims (for example, 925 sterling silver) before publishing.
 4. Connect real product data, inventory, payments, checkout, customer accounts, shipping, returns and email marketing.
 5. The cart, wishlist, search and newsletter interactions in this starter are demos, not a production ecommerce backend.
-6. Add the virtual try-on feature separately using an AR provider or a custom face/ear-tracking implementation. This starter does not activate the camera.
-7. For production, use an optimized image pipeline and configure any remote image domains as needed if you remove `unoptimized`.
+6. To enable camera try-on, host each product's `.glb` model on HTTPS with cross-origin access, then enter its URL in `/admin` and enable camera try-on. Use a model centered around its jewelry anchor (ring, wrist, or necklace).
+7. Try-on uses MediaPipe landmarks and Three.js in the browser. Camera frames are processed on the shopper's device and are not uploaded. The tracking runtime and public landmark models are downloaded from Google and jsDelivr; camera access requires HTTPS (localhost is supported for development).
+8. For production, use an optimized image pipeline and configure any remote image domains as needed if you remove `unoptimized`.

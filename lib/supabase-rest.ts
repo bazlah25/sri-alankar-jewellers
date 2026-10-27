@@ -23,6 +23,10 @@ export async function supabaseRequest<T>(path: string, init: RequestInit = {}): 
     const detail = await response.text();
     throw new Error(`Database request failed (${response.status}): ${detail.slice(0, 400)}`);
   }
-  if (response.status === 204) return undefined as T;
-  return response.json() as Promise<T>;
+  // PostgREST can return 201 with an empty body for `return=minimal`, just as
+  // it returns 204 for an empty response. Read the body once and only parse
+  // JSON when the response actually contains it.
+  const body = await response.text();
+  if (!body) return undefined as T;
+  return JSON.parse(body) as T;
 }

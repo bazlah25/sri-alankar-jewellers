@@ -2,14 +2,14 @@
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
-type CartLine = { productId: string; quantity: number };
+type CartLine = { productId: string; quantity: number; ringSize?: string };
 type ShopState = {
   cart: CartLine[];
   wishlist: string[];
   cartCount: number;
-  addToCart: (productId: string, quantity?: number) => void;
-  setCartQuantity: (productId: string, quantity: number) => void;
-  removeFromCart: (productId: string) => void;
+  addToCart: (productId: string, quantity?: number, ringSize?: string) => void;
+  setCartQuantity: (productId: string, quantity: number, ringSize?: string) => void;
+  removeFromCart: (productId: string, ringSize?: string) => void;
   toggleWishlist: (productId: string) => void;
   removeFromWishlist: (productId: string) => void;
 };
@@ -27,7 +27,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved) as { cart?: CartLine[]; wishlist?: string[] };
-        setCart(Array.isArray(parsed.cart) ? parsed.cart.filter(line => line && typeof line.productId === "string" && Number.isFinite(line.quantity) && line.quantity > 0) : []);
+        setCart(Array.isArray(parsed.cart) ? parsed.cart.filter(line => line && typeof line.productId === "string" && Number.isFinite(line.quantity) && line.quantity > 0 && (line.ringSize === undefined || typeof line.ringSize === "string")) : []);
         setWishlist(Array.isArray(parsed.wishlist) ? parsed.wishlist.filter(id => typeof id === "string") : []);
       }
     } catch {
@@ -44,16 +44,16 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     cart,
     wishlist,
     cartCount: cart.reduce((total, line) => total + line.quantity, 0),
-    addToCart: (productId, quantity = 1) => setCart(current => {
-      const existing = current.find(line => line.productId === productId);
+    addToCart: (productId, quantity = 1, ringSize) => setCart(current => {
+      const existing = current.find(line => line.productId === productId && line.ringSize === ringSize);
       return existing
-        ? current.map(line => line.productId === productId ? { ...line, quantity: line.quantity + quantity } : line)
-        : [...current, { productId, quantity }];
+        ? current.map(line => line.productId === productId && line.ringSize === ringSize ? { ...line, quantity: line.quantity + quantity } : line)
+        : [...current, { productId, quantity, ...(ringSize ? { ringSize } : {}) }];
     }),
-    setCartQuantity: (productId, quantity) => setCart(current => quantity <= 0
-      ? current.filter(line => line.productId !== productId)
-      : current.map(line => line.productId === productId ? { ...line, quantity } : line)),
-    removeFromCart: productId => setCart(current => current.filter(line => line.productId !== productId)),
+    setCartQuantity: (productId, quantity, ringSize) => setCart(current => quantity <= 0
+      ? current.filter(line => line.productId !== productId || line.ringSize !== ringSize)
+      : current.map(line => line.productId === productId && line.ringSize === ringSize ? { ...line, quantity } : line)),
+    removeFromCart: (productId, ringSize) => setCart(current => current.filter(line => line.productId !== productId || line.ringSize !== ringSize)),
     toggleWishlist: productId => setWishlist(current => current.includes(productId) ? current.filter(id => id !== productId) : [...current, productId]),
     removeFromWishlist: productId => setWishlist(current => current.filter(id => id !== productId)),
   }), [cart, wishlist]);

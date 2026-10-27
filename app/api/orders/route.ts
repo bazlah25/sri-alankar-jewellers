@@ -30,20 +30,25 @@ export async function POST(request: Request) {
   if (body.paymentMethod !== "cod" || !Array.isArray(body.items) || body.items.length < 1 || body.items.length > 50) {
     return NextResponse.json({ message: "This checkout currently accepts Cash on Delivery orders only." }, { status: 400 });
   }
-  const requested = new Map<string, number>();
+  const requested = new Map<string, { productId: string; ringSize?: string; quantity: number }>();
   for (const raw of body.items) {
     if (!raw || typeof raw !== "object") return NextResponse.json({ message: "Invalid order items." }, { status: 400 });
-    const item = raw as { productId?: unknown; quantity?: unknown };
+    const item = raw as { productId?: unknown; quantity?: unknown; ringSize?: unknown };
     if (typeof item.productId !== "string" || !Number.isInteger(item.quantity) || Number(item.quantity) < 1 || Number(item.quantity) > 20) return NextResponse.json({ message: "Invalid order quantities." }, { status: 400 });
-    requested.set(item.productId, (requested.get(item.productId) || 0) + Number(item.quantity));
+    if (item.ringSize !== undefined && (typeof item.ringSize !== "string" || item.ringSize.length > 40)) return NextResponse.json({ message: "Invalid ring size." }, { status: 400 });
+    const ringSize = typeof item.ringSize === "string" ? item.ringSize : undefined;
+    const key = `${item.productId}::${ringSize || ""}`;
+    const current = requested.get(key);
+    requested.set(key, { productId: item.productId, ringSize, quantity: (current?.quantity || 0) + Number(item.quantity) });
   }
   try {
     const products = await getDatabaseCatalog();
     if (!products) throw new Error("Database not configured");
-    const items = [...requested.entries()].map(([productId, quantity]) => {
+    const items = [...requested.values()].map(({ productId, ringSize, quantity }) => {
       const product = products.find(candidate => candidate.id === productId);
       if (!product || !product.available) throw new Error("A selected product is unavailable.");
-      return { product_id: product.id, name: product.name, price: product.price, quantity };
+      if (product.category === "Rings" && product.ringSizes?.length && (!ringSize || !product.ringSizes.includes(ringSize))) throw new Error("Choose a valid ring size for each ring.");
+      return { product_id: product.id, name: product.name, price: product.price, quantity, ...(ringSize ? { ring_size: ringSize } : {}) };
     });
     const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const shipping = subtotal >= 2999 ? 0 : 99;
@@ -55,6 +60,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ orderId: order.id });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Could not place the order.";
-    return NextResponse.json({ message: message.includes("unavailable") ? message : "Could not save your order. Please try again." }, { status: 503 });
+    return NextResponse.json({ message: message.includes("unavailable") || message.includes("ring size") ? message : "Could not save your order. Please try again." }, { status: 503 });
   }
 }

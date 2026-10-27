@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import ProductCard from "@/components/ProductCard";
-import type { Product } from "@/data/products";
 import { useProductCatalog } from "@/components/ProductCatalogProvider";
 
 const budgets = [
@@ -12,13 +11,10 @@ const budgets = [
   { label: "Above ₹3,000", value: "above-3000" },
 ];
 
-export default function GiftsCatalog({ products }: { products: Product[] }) {
+export default function GiftsCatalog() {
   const [budget, setBudget] = useState("all");
   const { products: catalogProducts } = useProductCatalog();
-  const allGiftProducts = useMemo(() => {
-    const ids = new Set(products.map(product => product.id));
-    return catalogProducts.filter(product => ids.has(product.id) || product.occasions.includes("Gifting") || product.collectionSlugs.includes("gifting-edit"));
-  }, [products, catalogProducts]);
+  const allGiftProducts = useMemo(() => catalogProducts.filter(product => product.occasions.includes("Gifting") || product.collectionSlugs.includes("gifting-edit")), [catalogProducts]);
   const filtered = useMemo(() => allGiftProducts.filter(product => {
     if (budget === "under-2000") return product.price < 2000;
     if (budget === "2000-3000") return product.price >= 2000 && product.price <= 3000;

@@ -31,13 +31,13 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           email: form.get("email"), phone: form.get("phone"), firstName: form.get("firstName"), lastName: form.get("lastName"),
           address: form.get("address"), addressLine2: form.get("addressLine2"), city: form.get("city"), state: form.get("state"), pincode: form.get("pincode"),
-          paymentMethod: form.get("payment"), items: lines.map(({ product, quantity }) => ({ productId: product!.id, quantity })),
+          paymentMethod: form.get("payment"), items: lines.map(({ product, quantity, ringSize }) => ({ productId: product!.id, quantity, ...(ringSize ? { ringSize } : {}) })),
         }),
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.message || "Could not place your order.");
       setOrderId(result.orderId); setSubmitted(true);
-      lines.forEach(line => removeFromCart(line.productId));
+      lines.forEach(line => removeFromCart(line.productId, line.ringSize));
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : "Could not place your order. Please try again.");
@@ -63,7 +63,7 @@ export default function CheckoutPage() {
         <button className="sa-checkout-submit" type="submit" disabled={submitting}><LockKeyhole size={15}/> {submitting ? "SAVING ORDER…" : "PLACE ORDER"}</button>
         <p className="sa-checkout-privacy-note">Your order and delivery details will be securely stored to fulfil your purchase.</p>
       </form>
-      <aside className="sa-checkout-summary"><h2>Your order</h2>{lines.map(({ product, quantity }) => product && <article className="sa-checkout-line" key={product.id}><Link className="sa-checkout-product-image" href={`/products/${product.id}`}><Image src={product.image} alt={product.name} fill sizes="76px" unoptimized/><span>{quantity}</span></Link><div><h3>{product.name}</h3><p>{product.material}</p></div><strong>{formatPrice(product.price * quantity)}</strong></article>)}
+      <aside className="sa-checkout-summary"><h2>Your order</h2>{lines.map(({ product, quantity, ringSize }) => product && <article className="sa-checkout-line" key={`${product.id}-${ringSize || "standard"}`}><Link className="sa-checkout-product-image" href={`/products/${product.id}`}><Image src={product.image} alt={product.name} fill sizes="76px" unoptimized/><span>{quantity}</span></Link><div><h3>{product.name}</h3><p>{product.material}{ringSize ? ` · Ring size ${ringSize}` : ""}</p></div><strong>{formatPrice(product.price * quantity)}</strong></article>)}
         <div className="sa-checkout-totals"><p><span>Subtotal</span><strong>{formatPrice(subtotal)}</strong></p><p><span>Shipping</span><strong>{shipping === 0 ? "Free" : formatPrice(shipping)}</strong></p><p className="sa-checkout-grand-total"><span>Total</span><strong>{formatPrice(total)}</strong></p></div>
         <p className="sa-checkout-shipping-note">{subtotal >= 2999 ? "Your order qualifies for free shipping." : `Add ${formatPrice(2999 - subtotal)} more for free shipping.`}</p>
       </aside>

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useShop } from "@/components/ShopProvider";
 import { formatPrice } from "@/data/products";
 import { useProductCatalog } from "@/components/ProductCatalogProvider";
+import { StorefrontHeroImage } from "@/components/StorefrontImages";
 import {
   ArrowRight, Search, UserRound, Heart, ShoppingBag,
   Menu, X, Play, Instagram, ChevronRight
@@ -97,11 +98,7 @@ export default function HomePage() {
       {notice && <div className="notice" role="status">{notice}<button onClick={() => setNotice("")} aria-label="Dismiss"><X size={16}/></button></div>}
 
       <section className="hero">
-        <Image
-          src="https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=2200&q=90"
-          alt="Silver jewellery campaign"
-          fill priority sizes="100vw" unoptimized className="hero-image"
-        />
+        <StorefrontHeroImage imageKey="home" fallbackSrc="/home-hero-luxury-jewellery.png" alt="Silver jewellery campaign" priority />
         <div className="hero-wash" />
         <div className="hero-copy">
           <p className="eyebrow">SRI ALANKAR JEWELLERS</p>

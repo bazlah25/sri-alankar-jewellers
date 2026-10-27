@@ -3,15 +3,19 @@ export type Product = {
   name: string;
   category: "Necklaces" | "Earrings" | "Rings" | "Bracelets" | "Anklets" | "Sets";
   gender?: "Male" | "Female" | "Unisex";
+  description?: string;
+  ringSizes?: string[];
   price: number;
   material: "925 Sterling Silver" | "Silver Plated";
   style: string;
   occasions: string[];
   available: boolean;
   image: string;
+  images?: string[];
   isNew?: boolean;
   isBestseller?: boolean;
   tryOn?: boolean;
+  tryOnModelUrl?: string;
   collectionSlugs: string[];
 };
 

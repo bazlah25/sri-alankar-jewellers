@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import { SlidersHorizontal, X, ChevronDown } from "lucide-react";
-import type { Product } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
 import { useProductCatalog } from "@/components/ProductCatalogProvider";
 
@@ -15,17 +14,8 @@ const priceRanges = [
   { label: "Above ₹5,000", min: "5001", max: "" },
 ];
 
-export default function ProductFilters({ products, initialCategory = "All", initialSort = "Featured", initialSearch = "", initialNewOnly = false, showCategoryPills = true }: { products: Product[]; initialCategory?: string; initialSort?: string; initialSearch?: string; initialNewOnly?: boolean; showCategoryPills?: boolean }) {
-  const { products: sharedCatalog } = useProductCatalog();
-  const catalog = useMemo(() => {
-    const suppliedIds = new Set(products.map(product => product.id));
-    return sharedCatalog.filter(product =>
-      suppliedIds.has(product.id) || (
-      (initialCategory === "All" || product.category === initialCategory) &&
-      (!initialNewOnly || product.isNew)
-      )
-    );
-  }, [products, sharedCatalog, initialCategory, initialNewOnly]);
+export default function ProductFilters({ initialCategory = "All", initialSort = "Featured", initialSearch = "", initialNewOnly = false, showCategoryPills = true }: { initialCategory?: string; initialSort?: string; initialSearch?: string; initialNewOnly?: boolean; showCategoryPills?: boolean }) {
+  const { products: catalog, loaded } = useProductCatalog();
   const [category, setCategory] = useState(categories.includes(initialCategory) ? initialCategory : "All");
   const [search, setSearch] = useState(initialSearch.trim());
   const [gender, setGender] = useState("");
@@ -85,7 +75,7 @@ export default function ProductFilters({ products, initialCategory = "All", init
           {controls}
         </aside>
         <div className="sa-results">
-          {filtered.length ? <div className="sa-products-grid">{filtered.map(p => <ProductCard key={p.id} product={p}/>)}</div> : <div className="sa-empty"><h2>No pieces found</h2><p>Try adjusting your filters to discover more silver jewellery.</p><button className="sa-button sa-button-dark" onClick={reset}>Clear filters</button></div>}
+          {!loaded ? <div className="sa-empty"><p>Loading products…</p></div> : filtered.length ? <div className="sa-products-grid">{filtered.map(p => <ProductCard key={p.id} product={p}/>)}</div> : <div className="sa-empty"><h2>No pieces found</h2><p>Try adjusting your filters to discover more silver jewellery.</p><button className="sa-button sa-button-dark" onClick={reset}>Clear filters</button></div>}
         </div>
       </div>
       {mobileOpen && <div className="sa-mobile-filter-backdrop" onClick={() => setMobileOpen(false)}><div className="sa-mobile-filter" onClick={e => e.stopPropagation()}><div className="sa-filter-title"><h2>Filter</h2><button aria-label="Close filters" onClick={() => setMobileOpen(false)}><X/></button></div>{controls}<button className="sa-button sa-button-dark" onClick={() => setMobileOpen(false)}>Show {filtered.length} pieces</button><button className="sa-clear-mobile" onClick={reset}>Clear all filters</button></div></div>}

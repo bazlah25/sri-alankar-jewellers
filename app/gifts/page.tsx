@@ -3,7 +3,6 @@ import Link from "next/link";
 import { ArrowRight, Gift, Heart, PackageCheck } from "lucide-react";
 import { SiteHeader, SiteFooter } from "@/components/SiteChrome";
 import GiftsCatalog from "@/components/GiftsCatalog";
-import { products } from "@/data/products";
 
 export const metadata = {
   title: "Gifts | Sri Alankar Jewellers",
@@ -17,8 +16,6 @@ const giftCategories = [
 ];
 
 export default function GiftsPage() {
-  const giftProducts = products.filter(product => product.occasions.includes("Gifting") || product.collectionSlugs.includes("gifting-edit"));
-
   return <main className="sa-page sa-gifts-page">
     <SiteHeader />
     <section className="sa-gifts-hero">
@@ -33,7 +30,7 @@ export default function GiftsPage() {
 
     <section className="sa-gift-category-section"><div className="sa-section-heading"><div><span className="sa-eyebrow">FIND THEIR KIND OF SILVER</span><h2>Shop by style</h2></div><Link className="sa-text-link" href="/collections/gifting-edit">GIFTING EDIT <ArrowRight size={14}/></Link></div><div className="sa-gift-category-grid">{giftCategories.map(category => <Link href={category.href} key={category.name} className="sa-gift-category-card"><div><Image src={category.image} alt={category.name} fill sizes="(max-width: 700px) 90vw, 32vw" unoptimized/><span className="sa-gift-category-arrow"><ArrowRight size={16}/></span></div><h3>{category.name}</h3><p>{category.line}</p></Link>)}</div></section>
 
-    <section className="sa-gifts-catalog" id="gift-picks"><div className="sa-section-heading"><div><span className="sa-eyebrow">A THOUGHTFUL PLACE TO START</span><h2>Gift-worthy silver</h2><p>Browse pieces selected from our gifting collection, then refine by budget.</p></div></div><GiftsCatalog products={giftProducts}/></section>
+    <section className="sa-gifts-catalog" id="gift-picks"><div className="sa-section-heading"><div><span className="sa-eyebrow">A THOUGHTFUL PLACE TO START</span><h2>Gift-worthy silver</h2><p>Browse pieces selected from our gifting collection, then refine by budget.</p></div></div><GiftsCatalog/></section>
     <section className="sa-gifts-note"><p>“The best gifts feel like you thought of them.”</p><span className="sa-eyebrow">SRI ALANKAR JEWELLERS</span><Link className="sa-button sa-button-outline" href="/collections/gifting-edit">EXPLORE THE GIFTING EDIT <ArrowRight size={15}/></Link></section>
     <SiteFooter />
   </main>;

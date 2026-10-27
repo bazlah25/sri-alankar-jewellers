@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ShopProvider } from "@/components/ShopProvider";
 import { ProductCatalogProvider } from "@/components/ProductCatalogProvider";
+import { StorefrontImagesProvider } from "@/components/StorefrontImages";
 
 export const metadata: Metadata = {
   title: "Sri Alankar Jewellers — Silver for Every You",
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body><ProductCatalogProvider><ShopProvider>{children}</ShopProvider></ProductCatalogProvider></body>
+      <body><StorefrontImagesProvider><ProductCatalogProvider><ShopProvider>{children}</ShopProvider></ProductCatalogProvider></StorefrontImagesProvider></body>
     </html>
   );
 }

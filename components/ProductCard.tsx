@@ -19,7 +19,7 @@ export default function ProductCard({ product }: { product: Product }) {
         <Link href={`/products/${product.id}`} className="sa-product-photo-link" aria-label={`View ${product.name}`}><Image src={product.image} alt={product.name} fill sizes="(max-width: 650px) 48vw, (max-width: 1000px) 30vw, 22vw" unoptimized /></Link>
         {product.isBestseller && <span className="sa-product-badge">Bestseller</span>}
         {product.isNew && <span className="sa-product-badge sa-new-badge">New In</span>}
-        {product.tryOn && <span className="sa-tryon-badge"><ScanFace size={13}/> Virtual Try-On</span>}
+        {product.tryOn && product.tryOnModelUrl && <span className="sa-tryon-badge"><ScanFace size={13}/> Virtual Try-On</span>}
         <button className={`sa-heart ${favorite ? "active" : ""}`} onClick={() => toggleWishlist(product.id)} aria-pressed={favorite} aria-label={favorite ? "Remove from wishlist" : "Add to wishlist"}>
           <Heart size={18} fill={favorite ? "currentColor" : "none"} />
         </button>

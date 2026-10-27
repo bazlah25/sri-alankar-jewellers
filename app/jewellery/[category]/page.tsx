@@ -1,8 +1,7 @@
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import ProductFilters from "@/components/ProductFilters";
-import { products } from "@/data/products";
+import { StorefrontHeroImage } from "@/components/StorefrontImages";
 
 const categoryPages = {
   necklaces: {
@@ -53,13 +52,11 @@ export default async function JewelleryCategoryPage({ params }: { params: Promis
   const { category } = await params;
   const page = categoryPages[category as CategorySlug];
   if (!page) notFound();
-  const categoryProducts = products.filter(product => product.category.toLowerCase() === page.name.toLowerCase());
-
   return (
     <main className="sa-page">
       <SiteHeader />
       <section className="sa-page-hero sa-jewellery-hero">
-        <Image src={`https://images.unsplash.com/${page.image}?auto=format&fit=crop&w=2000&q=85`} alt={`${page.name} in silver`} fill priority sizes="100vw" unoptimized />
+        <StorefrontHeroImage imageKey={`category:${category}`} fallbackSrc={`https://images.unsplash.com/${page.image}?auto=format&fit=crop&w=2000&q=85`} alt={`${page.name} in silver`} priority />
         <div className="sa-page-hero-wash" />
         <div className="sa-page-hero-copy">
           <h1>Explore Our<br /><em>{page.name}</em></h1>
@@ -67,8 +64,8 @@ export default async function JewelleryCategoryPage({ params }: { params: Promis
         </div>
       </section>
       <section className="sa-page-section sa-detail-products">
-        <div className="sa-section-heading"><div><span className="sa-eyebrow">MADE FOR YOUR MOMENTS</span><h2>{page.name}</h2></div><span className="sa-collection-count">{categoryProducts.length} PIECES</span></div>
-        {categoryProducts.length ? <ProductFilters products={products} initialCategory={page.name} showCategoryPills={false}/> : <div className="sa-empty"><h2>New pieces are coming soon</h2><p>We are preparing more silver designs for this category.</p></div>}
+        <div className="sa-section-heading"><div><span className="sa-eyebrow">MADE FOR YOUR MOMENTS</span><h2>{page.name}</h2></div></div>
+        <ProductFilters initialCategory={page.name} showCategoryPills={false}/>
       </section>
       <SiteFooter />
     </main>

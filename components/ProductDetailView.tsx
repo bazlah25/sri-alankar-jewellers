@@ -1,20 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Heart, Minus, Plus, ShoppingBag } from "lucide-react";
 import type { Product } from "@/data/products";
 import { formatPrice } from "@/data/products";
 import { useShop } from "@/components/ShopProvider";
-
-const galleryByCategory: Record<Product["category"], string[]> = {
-  Necklaces: ["photo-1486821416551-68a65ef4d618", "photo-1679973299029-eaa2f8ae11b2", "photo-1611652022419-a9419f74343d", "photo-1599643478518-a784e5dc4c8f"],
-  Earrings: ["photo-1717605876994-fbe98389ffbd", "photo-1765464281313-b3844388b316", "photo-1714733831162-0a6e849141be", "photo-1630019852942-f89202989a59"],
-  Rings: ["photo-1624588057318-5f1b2eb81012", "photo-1599707367072-cd6ada2bc375", "photo-1550368566-f9cc32d7392d", "photo-1605100804763-247f67b3557e"],
-  Bracelets: ["photo-1744722093742-aad22c7fa68b", "photo-1581522723372-e1a239e7ed2d", "photo-1611652022419-a9419f74343d", "photo-1744722093742-aad22c7fa68b"],
-  Anklets: ["photo-1774978237834-237b7aa7bd6c", "photo-1617038260897-41a1f14a8ca0", "photo-1617038220319-276d3cfab638", "photo-1774978237834-237b7aa7bd6c"],
-  Sets: ["photo-1617038260897-41a1f14a8ca0", "photo-1486821416551-68a65ef4d618", "photo-1717605876994-fbe98389ffbd", "photo-1624588057318-5f1b2eb81012"],
-};
+import VirtualTryOnExperience from "@/components/VirtualTryOnExperience";
 
 const descriptions: Record<Product["category"], string> = {
   Necklaces: "A considered silver necklace designed to bring meaning to everyday moments and special occasions alike.",
@@ -26,10 +18,15 @@ const descriptions: Record<Product["category"], string> = {
 };
 
 export default function ProductDetailView({ product }: { product: Product }) {
-  const gallery = galleryByCategory[product.category].map(id => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=1200&q=88`);
-  gallery[0] = product.image;
+  const descriptionPoints = (product.description || descriptions[product.category])
+    .split(/\r?\n/)
+    .map(point => point.replace(/^\s*[-•]\s*/, "").trim())
+    .filter(Boolean);
+  const uploadedGallery = (product.images || []).filter(Boolean);
+  const gallery = uploadedGallery.length ? uploadedGallery : [product.image];
   const [activeImage, setActiveImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [selectedRingSize, setSelectedRingSize] = useState("");
   const [notice, setNotice] = useState("");
   const { wishlist, toggleWishlist, addToCart } = useShop();
   const saved = wishlist.includes(product.id);
@@ -39,6 +36,10 @@ export default function ProductDetailView({ product }: { product: Product }) {
   const [reviewText, setReviewText] = useState("");
   const [reviewRating, setReviewRating] = useState("5");
   const [reviews, setReviews] = useState<Array<{ name: string; text: string; rating: number }>>([]);
+
+  useEffect(() => { setActiveImage(0); setSelectedRingSize(""); }, [product.id]);
+  const ringSizes = product.category === "Rings" ? product.ringSizes || [] : [];
+  const requiresRingSize = ringSizes.length > 0;
 
   const checkPincode = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -64,9 +65,10 @@ export default function ProductDetailView({ product }: { product: Product }) {
       <span className="sa-eyebrow">{product.category} · {product.material}</span>
       <h1>{product.name}</h1>
       <p className="sa-product-detail-price">{formatPrice(product.price)}</p>
-      <p className="sa-product-detail-description">{descriptions[product.category]}</p>
       <p className="sa-product-material-detail">{product.material === "925 Sterling Silver" ? "925 Sterling Silver · Solid sterling silver" : "Silver plated"}</p>
-      <div className="sa-product-purchase-row"><div className="sa-quantity-control" aria-label="Quantity"><button type="button" aria-label="Decrease quantity" disabled={quantity <= 1} onClick={() => setQuantity(value => Math.max(1, value - 1))}><Minus size={14}/></button><span>{quantity}</span><button type="button" aria-label="Increase quantity" onClick={() => setQuantity(value => value + 1)}><Plus size={14}/></button></div><button type="button" className="sa-product-add" disabled={!product.available} onClick={() => { addToCart(product.id, quantity); setNotice(`${quantity} × ${product.name} added to your demo bag.`); }}><ShoppingBag size={16}/>{product.available ? "ADD TO BAG" : "SOLD OUT"}</button><button type="button" className={`sa-product-wishlist ${saved ? "active" : ""}`} aria-label={saved ? "Remove from wishlist" : "Add to wishlist"} aria-pressed={saved} onClick={() => toggleWishlist(product.id)}><Heart size={18} fill={saved ? "currentColor" : "none"}/></button></div>
+      <VirtualTryOnExperience product={product}/>
+      {requiresRingSize && <fieldset className="sa-ring-size-picker"><legend>Choose ring size</legend><div>{ringSizes.map(size => <button key={size} type="button" className={selectedRingSize === size ? "selected" : ""} aria-pressed={selectedRingSize === size} onClick={() => setSelectedRingSize(size)}>{size}</button>)}</div>{!selectedRingSize && <small>Select a size to add this ring to your bag.</small>}</fieldset>}
+      <div className="sa-product-purchase-row"><div className="sa-quantity-control" aria-label="Quantity"><button type="button" aria-label="Decrease quantity" disabled={quantity <= 1} onClick={() => setQuantity(value => Math.max(1, value - 1))}><Minus size={14}/></button><span>{quantity}</span><button type="button" aria-label="Increase quantity" onClick={() => setQuantity(value => value + 1)}><Plus size={14}/></button></div><button type="button" className="sa-product-add" disabled={!product.available || (requiresRingSize && !selectedRingSize)} onClick={() => { addToCart(product.id, quantity, selectedRingSize || undefined); setNotice(`${quantity} × ${product.name}${selectedRingSize ? ` (size ${selectedRingSize})` : ""} added to your demo bag.`); }}><ShoppingBag size={16}/>{product.available ? "ADD TO BAG" : "SOLD OUT"}</button><button type="button" className={`sa-product-wishlist ${saved ? "active" : ""}`} aria-label={saved ? "Remove from wishlist" : "Add to wishlist"} aria-pressed={saved} onClick={() => toggleWishlist(product.id)}><Heart size={18} fill={saved ? "currentColor" : "none"}/></button></div>
       {notice && <p className="sa-product-notice" role="status">{notice}</p>}
       <form className="sa-pincode-check" onSubmit={checkPincode}>
         <label htmlFor="delivery-pincode">Check delivery availability</label>
@@ -74,7 +76,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
         {pincodeMessage && <p role="status">{pincodeMessage}</p>}
       </form>
       <div className="sa-product-promises"><p>925 silver craftsmanship</p><p>Gift-ready packaging</p><p>Easy returns</p></div>
-      <details className="sa-product-information"><summary>Product details</summary><p>{descriptions[product.category]} Style: {product.style}. Suitable for {product.occasions.join(", ").toLowerCase()}.</p></details>
+      <details className="sa-product-information"><summary>Product details</summary><ul className="sa-product-detail-points">{descriptionPoints.map((point, index) => <li key={`${index}-${point}`}>{point}</li>)}</ul></details>
       <details className="sa-product-information"><summary>Shipping & returns</summary><p>Shipping and return policies can be confirmed at checkout once the store is connected to an ecommerce service.</p></details>
       <p className="sa-demo-disclaimer">Demo storefront: bag, wishlist, inventory, and checkout are not connected to a live store.</p>
     </div>

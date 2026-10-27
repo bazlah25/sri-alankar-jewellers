@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import ProductFilters from "@/components/ProductFilters";
-import { products } from "@/data/products";
 
 export const metadata = {
   title: "Search Jewellery | Sri Alankar Jewellers",
@@ -20,7 +19,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
       <div className="sa-page-hero-copy"><span className="sa-eyebrow">FIND YOUR FAVOURITE</span><h1>Search<br/><em>the collection</em></h1><p>{query ? `Results for “${query}”` : "Enter a piece, category, style, or occasion above."}</p></div>
     </section>
     <section className="sa-page-section sa-shop-all">
-      {query ? <ProductFilters products={products} initialSearch={query} /> : <div className="sa-empty"><h2>What are you looking for?</h2><p>Search by product name, category, material, style, or occasion.</p></div>}
+      {query ? <ProductFilters initialSearch={query} /> : <div className="sa-empty"><h2>What are you looking for?</h2><p>Search by product name, category, material, style, or occasion.</p></div>}
     </section>
     <SiteFooter />
   </main>;
