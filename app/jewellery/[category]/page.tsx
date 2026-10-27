@@ -68,7 +68,7 @@ export default async function JewelleryCategoryPage({ params }: { params: Promis
       </section>
       <section className="sa-page-section sa-detail-products">
         <div className="sa-section-heading"><div><span className="sa-eyebrow">MADE FOR YOUR MOMENTS</span><h2>{page.name}</h2></div><span className="sa-collection-count">{categoryProducts.length} PIECES</span></div>
-        {categoryProducts.length ? <ProductFilters products={categoryProducts} initialCategory="All" showCategoryPills={false}/> : <div className="sa-empty"><h2>New pieces are coming soon</h2><p>We are preparing more silver designs for this category.</p></div>}
+        {categoryProducts.length ? <ProductFilters products={products} initialCategory={page.name} showCategoryPills={false}/> : <div className="sa-empty"><h2>New pieces are coming soon</h2><p>We are preparing more silver designs for this category.</p></div>}
       </section>
       <SiteFooter />
     </main>

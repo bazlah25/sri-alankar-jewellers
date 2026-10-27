@@ -6,12 +6,14 @@ import { useState, type FormEvent } from "react";
 import { ArrowLeft, LockKeyhole } from "lucide-react";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { useShop } from "@/components/ShopProvider";
-import { formatPrice, products } from "@/data/products";
+import { formatPrice } from "@/data/products";
+import { useProductCatalog } from "@/components/ProductCatalogProvider";
 
 export default function CheckoutPage() {
   const { cart } = useShop();
+  const { products: catalogProducts } = useProductCatalog();
   const [submitted, setSubmitted] = useState(false);
-  const lines = cart.map(line => ({ ...line, product: products.find(product => product.id === line.productId) })).filter(line => line.product);
+  const lines = cart.map(line => ({ ...line, product: catalogProducts.find(product => product.id === line.productId) })).filter(line => line.product);
   const subtotal = lines.reduce((sum, line) => sum + line.product!.price * line.quantity, 0);
   const shipping = subtotal >= 2999 || subtotal === 0 ? 0 : 99;
   const total = subtotal + shipping;

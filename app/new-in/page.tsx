@@ -21,7 +21,7 @@ export default function NewInPage() {
       </section>
       <section className="sa-page-section sa-shop-all">
         <div className="sa-section-heading"><div><h2>Just Arrived</h2><p>The newest additions to Sri Alankar Jewellers.</p></div></div>
-        {newProducts.length ? <ProductFilters products={newProducts} initialCategory="All" showCategoryPills={false}/> : <div className="sa-empty"><h2>New pieces are coming soon</h2><p>Check back soon for our latest silver designs.</p></div>}
+        {newProducts.length ? <ProductFilters products={products} initialCategory="All" initialNewOnly showCategoryPills={false}/> : <div className="sa-empty"><h2>New pieces are coming soon</h2><p>Check back soon for our latest silver designs.</p></div>}
       </section>
       <SiteFooter />
     </main>

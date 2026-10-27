@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { SlidersHorizontal, X, ChevronDown } from "lucide-react";
 import type { Product } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
+import { useProductCatalog } from "@/components/ProductCatalogProvider";
 
 const categories = ["All", "Necklaces", "Earrings", "Rings", "Bracelets", "Anklets", "Sets"];
 const styleOptions = ["Minimal & Dainty", "Classic & Timeless", "Modern", "Floral & Nature-Inspired", "Traditional", "Statement", "Layered & Stackable"];
@@ -27,7 +28,17 @@ const priceRanges = [
   { label: "Above ₹5,000", min: "5001", max: "" },
 ];
 
-export default function ProductFilters({ products, initialCategory = "All", initialSort = "Featured", initialSearch = "", showCategoryPills = true }: { products: Product[]; initialCategory?: string; initialSort?: string; initialSearch?: string; showCategoryPills?: boolean }) {
+export default function ProductFilters({ products, initialCategory = "All", initialSort = "Featured", initialSearch = "", initialNewOnly = false, showCategoryPills = true }: { products: Product[]; initialCategory?: string; initialSort?: string; initialSearch?: string; initialNewOnly?: boolean; showCategoryPills?: boolean }) {
+  const { products: sharedCatalog } = useProductCatalog();
+  const catalog = useMemo(() => {
+    const suppliedIds = new Set(products.map(product => product.id));
+    return sharedCatalog.filter(product =>
+      suppliedIds.has(product.id) || (
+      (initialCategory === "All" || product.category === initialCategory) &&
+      (!initialNewOnly || product.isNew)
+      )
+    );
+  }, [products, sharedCatalog, initialCategory, initialNewOnly]);
   const [category, setCategory] = useState(categories.includes(initialCategory) ? initialCategory : "All");
   const [search, setSearch] = useState(initialSearch.trim());
   const [style, setStyle] = useState("");
@@ -43,7 +54,8 @@ export default function ProductFilters({ products, initialCategory = "All", init
   const [sortOpen, setSortOpen] = useState(false);
 
   const filtered = useMemo(() => {
-    const result = products.filter(p =>
+    const result = catalog.filter(p =>
+      (!initialNewOnly || p.isNew) &&
       (!search || [p.name, p.category, p.material, p.style, ...p.occasions].join(" ").toLocaleLowerCase().includes(search.toLocaleLowerCase())) &&
       (category === "All" || p.category === category) &&
       (!style || (styleValues[style] || []).includes(p.style)) &&
@@ -60,7 +72,7 @@ export default function ProductFilters({ products, initialCategory = "All", init
       if (sort === "Popularity") return Number(Boolean(b.isBestseller)) - Number(Boolean(a.isBestseller));
       return 0;
     });
-  }, [products, search, category, style, material, occasion, availability, sort, minPrice, maxPrice]);
+  }, [catalog, initialNewOnly, search, category, style, material, occasion, availability, sort, minPrice, maxPrice]);
 
   const reset = () => { setCategory("All"); setStyle(""); setMaterial(""); setOccasion(""); setAvailability("All"); setMinPrice(""); setMaxPrice(""); setSelectedPriceRange(""); setSort("Featured"); };
   const selectPriceRange = (range: typeof priceRanges[number]) => {

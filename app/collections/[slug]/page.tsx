@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { collections } from "@/data/collections";
 import { products } from "@/data/products";
-import ProductCard from "@/components/ProductCard";
+import CollectionProductGrid from "@/components/CollectionProductGrid";
 
 export function generateStaticParams() {
   return collections.map(collection => ({ slug: collection.slug }));
@@ -33,7 +33,7 @@ export default async function CollectionDetailPage({ params }: { params: Promise
       </section>
       <section className="sa-page-section sa-detail-intro"><p>{collection.intro}</p></section>
       <section className="sa-page-section sa-detail-products"><div className="sa-section-heading"><div><span className="sa-eyebrow">CURATED FOR YOU</span><h2>Discover the Pieces</h2></div><span className="sa-collection-count">{collectionProducts.length} PIECES</span></div>
-        {collectionProducts.length ? <div className="sa-products-grid">{collectionProducts.map(product => <ProductCard key={product.id} product={product}/>)}</div> : <p>New pieces are coming soon.</p>}
+        <CollectionProductGrid collectionSlug={slug} products={collectionProducts}/>
       </section>
       <div className="sa-back-to-collections"><Link className="sa-button sa-button-outline" href="/collections">EXPLORE ALL COLLECTIONS <ArrowRight size={15}/></Link></div>
     <SiteFooter/>

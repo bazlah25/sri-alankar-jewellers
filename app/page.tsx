@@ -4,7 +4,8 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useShop } from "@/components/ShopProvider";
-import { products as catalogProducts, formatPrice } from "@/data/products";
+import { formatPrice } from "@/data/products";
+import { useProductCatalog } from "@/components/ProductCatalogProvider";
 import {
   ArrowRight, Search, UserRound, Heart, ShoppingBag, Gem, Gift,
   Truck, RotateCcw, Menu, X, Play, Instagram, ChevronRight
@@ -19,8 +20,6 @@ const categories = [
   { name: "Sets", image: "https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?auto=format&fit=crop&w=600&q=85" },
 ];
 
-const products = catalogProducts.slice(0, 5);
-
 function Photo({ src, alt, className = "" }: { src: string; alt: string; className?: string }) {
   return (
     <div className={`photo ${className}`}>
@@ -30,7 +29,9 @@ function Photo({ src, alt, className = "" }: { src: string; alt: string; classNa
 }
 
 export default function HomePage() {
+  const { products: catalogProducts } = useProductCatalog();
   const { wishlist, toggleWishlist, cartCount, addToCart } = useShop();
+  const products = catalogProducts.filter(product => product.isBestseller || product.isNew).slice(0, 5);
   const [menuOpen, setMenuOpen] = useState(false);
   const [jewelleryOpen, setJewelleryOpen] = useState(false);
   const jewelleryMenuRef = useRef<HTMLDivElement>(null);

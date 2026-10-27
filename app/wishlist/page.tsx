@@ -4,11 +4,12 @@ import Link from "next/link";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import ProductCard from "@/components/ProductCard";
 import { useShop } from "@/components/ShopProvider";
-import { products } from "@/data/products";
+import { useProductCatalog } from "@/components/ProductCatalogProvider";
 
 export default function WishlistPage() {
   const { wishlist } = useShop();
-  const savedProducts = products.filter(product => wishlist.includes(product.id));
+  const { products: catalogProducts } = useProductCatalog();
+  const savedProducts = catalogProducts.filter(product => wishlist.includes(product.id));
 
   return <main className="sa-page sa-wishlist-page">
     <SiteHeader />

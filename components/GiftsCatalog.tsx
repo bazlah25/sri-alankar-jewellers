@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import ProductCard from "@/components/ProductCard";
 import type { Product } from "@/data/products";
+import { useProductCatalog } from "@/components/ProductCatalogProvider";
 
 const budgets = [
   { label: "All gifts", value: "all" },
@@ -13,12 +14,17 @@ const budgets = [
 
 export default function GiftsCatalog({ products }: { products: Product[] }) {
   const [budget, setBudget] = useState("all");
-  const filtered = useMemo(() => products.filter(product => {
+  const { products: catalogProducts } = useProductCatalog();
+  const allGiftProducts = useMemo(() => {
+    const ids = new Set(products.map(product => product.id));
+    return catalogProducts.filter(product => ids.has(product.id) || product.occasions.includes("Gifting") || product.collectionSlugs.includes("gifting-edit"));
+  }, [products, catalogProducts]);
+  const filtered = useMemo(() => allGiftProducts.filter(product => {
     if (budget === "under-2000") return product.price < 2000;
     if (budget === "2000-3000") return product.price >= 2000 && product.price <= 3000;
     if (budget === "above-3000") return product.price > 3000;
     return true;
-  }), [products, budget]);
+  }), [allGiftProducts, budget]);
 
   return <>
     <nav className="sa-gift-budget-filter" aria-label="Filter gifts by budget">

@@ -5,11 +5,13 @@ import Link from "next/link";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { useShop } from "@/components/ShopProvider";
-import { formatPrice, products } from "@/data/products";
+import { formatPrice } from "@/data/products";
+import { useProductCatalog } from "@/components/ProductCatalogProvider";
 
 export default function CartPage() {
   const { cart, setCartQuantity, removeFromCart } = useShop();
-  const lines = cart.map(line => ({ ...line, product: products.find(product => product.id === line.productId) })).filter(line => line.product);
+  const { products: catalogProducts } = useProductCatalog();
+  const lines = cart.map(line => ({ ...line, product: catalogProducts.find(product => product.id === line.productId) })).filter(line => line.product);
   const subtotal = lines.reduce((sum, line) => sum + line.product!.price * line.quantity, 0);
 
   return <main className="sa-page sa-basket-page">
