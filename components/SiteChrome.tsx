@@ -31,7 +31,7 @@ export function SiteHeader() {
   }, []);
 
   return <>
-    <div className="announcement"><span className="announcement-arrow">←</span><span>FREE SHIPPING ON ORDERS ABOVE ₹2,999</span><i/><span>EASY RETURNS</span><i/><span>CERTIFIED 925 SILVER</span><span className="announcement-arrow">→</span></div>
+    <div className="announcement"><span>CERTIFIED 925 SILVER</span></div>
     <header className="header">
       <button className="icon-button mobile-menu" aria-label={menuOpen ? "Close menu" : "Open menu"} onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X size={21}/> : <Menu size={21}/>}</button>
       <Link href="/" className="wordmark logo-link" aria-label="Sri Alankar Jewellers home"><Image src="/sri-alankar-logo.png" alt="Sri Alankar Jewellers" width={260} height={100} priority className="brand-logo"/></Link>
@@ -41,7 +41,7 @@ export function SiteHeader() {
         <div className="nav-dropdown" ref={jewelleryMenuRef}>
           <button className="nav-dropdown-trigger" aria-haspopup="true" aria-expanded={jewelleryOpen} onClick={() => setJewelleryOpen(!jewelleryOpen)}>Jewellery</button>
           {jewelleryOpen && <div className="nav-dropdown-menu" role="menu">
-            {[['All', '/jewellery'], ['Necklaces', '/jewellery/necklaces'], ['Rings', '/jewellery/rings'], ['Earrings', '/jewellery/earrings'], ['Bracelets', '/jewellery/bracelets'], ['Anklets', '/jewellery/anklets'], ['Sets', '/jewellery/sets']].map(([label, href]) => <Link role="menuitem" key={label} href={href} onClick={() => { setJewelleryOpen(false); setMenuOpen(false); }}>{label}</Link>)}
+            {[['All', '/jewellery'], ['Necklace', '/jewellery/necklaces'], ['Earrings', '/jewellery/earrings'], ['Rings', '/jewellery/rings'], ['Bracelets', '/jewellery/bracelets'], ['Photo Frames', '/jewellery'], ['Pooja Essentials', '/jewellery']].map(([label, href]) => <Link role="menuitem" key={label} href={href} onClick={() => { setJewelleryOpen(false); setMenuOpen(false); }}>{label}</Link>)}
           </div>}
         </div>
         <Link href="/collections" onClick={() => setMenuOpen(false)}>Collections</Link><Link href="/gifts" onClick={() => setMenuOpen(false)}>Gifts</Link><Link href="/about" onClick={() => setMenuOpen(false)}>About</Link>

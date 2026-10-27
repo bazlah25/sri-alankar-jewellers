@@ -7,17 +7,17 @@ import { useShop } from "@/components/ShopProvider";
 import { formatPrice } from "@/data/products";
 import { useProductCatalog } from "@/components/ProductCatalogProvider";
 import {
-  ArrowRight, Search, UserRound, Heart, ShoppingBag, Gem, Gift,
-  Truck, RotateCcw, Menu, X, Play, Instagram, ChevronRight
+  ArrowRight, Search, UserRound, Heart, ShoppingBag,
+  Menu, X, Play, Instagram, ChevronRight
 } from "lucide-react";
 
 const categories = [
-  { name: "Necklaces", image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=600&q=85" },
-  { name: "Earrings", image: "https://images.unsplash.com/photo-1630019852942-f89202989a59?auto=format&fit=crop&w=600&q=85" },
-  { name: "Rings", image: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=600&q=85" },
-  { name: "Bracelets", image: "https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=600&q=85" },
-  { name: "Anklets", image: "https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=600&q=85" },
-  { name: "Sets", image: "https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?auto=format&fit=crop&w=600&q=85" },
+  { name: "Necklace", href: "/jewellery/necklaces", image: "/categories/necklace-category.jpg" },
+  { name: "Earrings", href: "/jewellery/earrings", image: "/categories/earrings-category.jpg" },
+  { name: "Rings", href: "/jewellery/rings", image: "/categories/rings-category.jpg" },
+  { name: "Bracelets", href: "/jewellery/bracelets", image: "/categories/bracelet-category.jpg" },
+  { name: "Photo Frames", href: "/jewellery", image: "/categories/photo-frames-category.jpg" },
+  { name: "Pooja Essentials", href: "/jewellery", image: "/categories/pooja-essentials-category.jpg" },
 ];
 
 function Photo({ src, alt, className = "" }: { src: string; alt: string; className?: string }) {
@@ -57,13 +57,7 @@ export default function HomePage() {
   return (
     <main>
       <div className="announcement">
-        <span className="announcement-arrow">←</span>
-        <span>FREE SHIPPING ON ORDERS ABOVE ₹2,999</span>
-        <i />
-        <span>EASY RETURNS</span>
-        <i />
         <span>CERTIFIED 925 SILVER</span>
-        <span className="announcement-arrow">→</span>
       </div>
 
       <header className="header">
@@ -77,7 +71,7 @@ export default function HomePage() {
           <div className="nav-dropdown" ref={jewelleryMenuRef}>
             <button className="nav-dropdown-trigger" aria-haspopup="true" aria-expanded={jewelleryOpen} onClick={() => setJewelleryOpen(!jewelleryOpen)}>Jewellery</button>
             {jewelleryOpen && <div className="nav-dropdown-menu" role="menu">
-              {[['All', '/jewellery'], ['Necklaces', '/jewellery/necklaces'], ['Rings', '/jewellery/rings'], ['Earrings', '/jewellery/earrings'], ['Bracelets', '/jewellery/bracelets'], ['Anklets', '/jewellery/anklets'], ['Sets', '/jewellery/sets']].map(([label, href]) => <a role="menuitem" key={label} href={href} onClick={() => { setJewelleryOpen(false); setMenuOpen(false); }}>{label}</a>)}
+              {[['All', '/jewellery'], ['Necklace', '/jewellery/necklaces'], ['Earrings', '/jewellery/earrings'], ['Rings', '/jewellery/rings'], ['Bracelets', '/jewellery/bracelets'], ['Photo Frames', '/jewellery'], ['Pooja Essentials', '/jewellery']].map(([label, href]) => <a role="menuitem" key={label} href={href} onClick={() => { setJewelleryOpen(false); setMenuOpen(false); }}>{label}</a>)}
             </div>}
           </div>
           <a href="/collections">Collections</a>
@@ -110,19 +104,12 @@ export default function HomePage() {
         />
         <div className="hero-wash" />
         <div className="hero-copy">
-          <p className="eyebrow">THE EVERYDAY SILVER EDIT</p>
-          <h1>Silver for<br />Every <em>You</em></h1>
+          <p className="eyebrow">SRI ALANKAR JEWELLERS</p>
+          <h1>Exclusive Jewels,<br /><em>Exclusive You.</em></h1>
           <p className="hero-description">Timeless pieces for everyday moments,<br className="desktop-break" /> special milestones, and everything in between.</p>
           <a className="button button-dark" href="#signature">SHOP THE COLLECTION <ArrowRight size={16}/></a>
         </div>
         <p className="hero-script">More than<br />Jewellery ♡</p>
-      </section>
-
-      <section className="benefits" aria-label="Shopping benefits">
-        <div className="benefit"><Gem /><strong>925 STERLING SILVER</strong><span>Quality you can trust</span></div>
-        <div className="benefit"><Gift /><strong>BEAUTIFUL GIFT PACKAGING</strong><span>For every special moment</span></div>
-        <div className="benefit"><Truck /><strong>FREE SHIPPING</strong><span>On orders above ₹2,999</span></div>
-        <div className="benefit"><RotateCcw /><strong>EASY RETURNS</strong><span>Hassle-free shopping</span></div>
       </section>
 
       <section className="section category-section" id="categories">
@@ -132,7 +119,7 @@ export default function HomePage() {
         </div>
         <div className="category-grid">
           {categories.map(category => (
-            <a className="category-card" href={`/jewellery/${category.name.toLowerCase()}`} key={category.name}>
+            <a className="category-card" href={category.href} key={category.name}>
               <Photo src={category.image} alt={category.name} />
               <span>{category.name}</span>
             </a>
@@ -202,7 +189,7 @@ export default function HomePage() {
       </section>
 
       <footer className="footer" id="footer">
-        <div><a href="/" className="wordmark logo-link footer-logo-link" aria-label="Sri Alankar Jewellers home"><Image src="/sri-alankar-logo.png" alt="Sri Alankar Jewellers" width={260} height={100} className="brand-logo" /></a><p>Silver for every version of you.</p></div>
+        <div><a href="/" className="wordmark logo-link footer-logo-link" aria-label="Sri Alankar Jewellers home"><Image src="/sri-alankar-logo.png" alt="Sri Alankar Jewellers" width={260} height={100} className="brand-logo" /></a><p>Exclusive jewels, exclusive you.</p></div>
         <div><strong>EXPLORE</strong><a href="/new-in">New In</a><a href="/jewellery">Jewellery</a><a href="/collections">Collections</a><a href="/gifts">Gifts</a></div>
         <div><strong>HELP</strong><span className="footer-static-link">Shipping &amp; Returns</span><span className="footer-static-link">Care Guide</span><span className="footer-static-link">Contact Us</span></div>
         <div><strong>FOLLOW ALONG</strong><span className="footer-static-link"><Instagram size={16}/> Instagram</span><span className="footer-static-link">Privacy &amp; Terms</span></div>

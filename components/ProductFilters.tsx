@@ -7,19 +7,6 @@ import ProductCard from "@/components/ProductCard";
 import { useProductCatalog } from "@/components/ProductCatalogProvider";
 
 const categories = ["All", "Necklaces", "Earrings", "Rings", "Bracelets", "Anklets", "Sets"];
-const styleOptions = ["Minimal & Dainty", "Classic & Timeless", "Modern", "Floral & Nature-Inspired", "Traditional", "Statement", "Layered & Stackable"];
-const styleValues: Record<string, string[]> = {
-  "Minimal & Dainty": ["Minimal"], "Classic & Timeless": ["Classic"], Modern: ["Modern"],
-  "Floral & Nature-Inspired": ["Floral", "Nature-inspired"], Traditional: ["Traditional"],
-  Statement: ["Statement"], "Layered & Stackable": ["Layered & Stackable"],
-};
-const materials = ["925 Sterling Silver", "Silver Plated"];
-const occasionOptions = ["Everyday Wear", "Work & Office", "Party & Evening", "Festivals", "Weddings & Celebrations", "Gifting"];
-const occasionValues: Record<string, string[]> = {
-  "Everyday Wear": ["Everyday", "Everyday Wear"], "Work & Office": ["Everyday", "Work & Office"],
-  "Party & Evening": ["Celebration", "Party & Evening"], Festivals: ["Celebration", "Festivals"],
-  "Weddings & Celebrations": ["Celebration", "Weddings & Celebrations"], Gifting: ["Gifting"],
-};
 const priceRanges = [
   { label: "Under ₹1,000", min: "", max: "999" },
   { label: "₹1,000 – ₹2,000", min: "1000", max: "2000" },
@@ -41,10 +28,7 @@ export default function ProductFilters({ products, initialCategory = "All", init
   }, [products, sharedCatalog, initialCategory, initialNewOnly]);
   const [category, setCategory] = useState(categories.includes(initialCategory) ? initialCategory : "All");
   const [search, setSearch] = useState(initialSearch.trim());
-  const [style, setStyle] = useState("");
-  const [material, setMaterial] = useState("");
-  const [occasion, setOccasion] = useState("");
-  const [availability, setAvailability] = useState("All");
+  const [gender, setGender] = useState("");
   const sortOptions = ["Featured", "Newest", "Popularity", "Price: Low to High", "Price: High to Low"];
   const [sort, setSort] = useState(sortOptions.includes(initialSort) ? initialSort : "Featured");
   const [minPrice, setMinPrice] = useState("");
@@ -58,10 +42,7 @@ export default function ProductFilters({ products, initialCategory = "All", init
       (!initialNewOnly || p.isNew) &&
       (!search || [p.name, p.category, p.material, p.style, ...p.occasions].join(" ").toLocaleLowerCase().includes(search.toLocaleLowerCase())) &&
       (category === "All" || p.category === category) &&
-      (!style || (styleValues[style] || []).includes(p.style)) &&
-      (!material || p.material === material) &&
-      (!occasion || (occasionValues[occasion] || []).some(value => p.occasions.includes(value))) &&
-      (availability === "All" || (availability === "In stock" ? p.available : !p.available)) &&
+      (!(category === "Rings" || category === "Bracelets") || !gender || p.gender === gender || p.gender === "Unisex") &&
       (minPrice === "" || p.price >= Number(minPrice)) &&
       (maxPrice === "" || p.price <= Number(maxPrice))
     );
@@ -72,9 +53,9 @@ export default function ProductFilters({ products, initialCategory = "All", init
       if (sort === "Popularity") return Number(Boolean(b.isBestseller)) - Number(Boolean(a.isBestseller));
       return 0;
     });
-  }, [catalog, initialNewOnly, search, category, style, material, occasion, availability, sort, minPrice, maxPrice]);
+  }, [catalog, initialNewOnly, search, category, gender, sort, minPrice, maxPrice]);
 
-  const reset = () => { setCategory("All"); setStyle(""); setMaterial(""); setOccasion(""); setAvailability("All"); setMinPrice(""); setMaxPrice(""); setSelectedPriceRange(""); setSort("Featured"); };
+  const reset = () => { setCategory("All"); setGender(""); setMinPrice(""); setMaxPrice(""); setSelectedPriceRange(""); setSort("Featured"); };
   const selectPriceRange = (range: typeof priceRanges[number]) => {
     const next = selectedPriceRange === range.label ? null : range;
     setSelectedPriceRange(next?.label || "");
@@ -83,9 +64,7 @@ export default function ProductFilters({ products, initialCategory = "All", init
   };
   const controls = (
     <>
-      <details className="sa-filter-accordion" open><summary><span>Style</span><ChevronDown aria-hidden="true" size={15}/></summary><fieldset className="sa-filter-choice-group" aria-label="Style">{styleOptions.map(option => <label key={option}><input type="radio" name="style" checked={style === option} onChange={() => setStyle(option)}/><span>{option}</span></label>)}</fieldset></details>
-      <details className="sa-filter-accordion" open><summary><span>Material</span><ChevronDown aria-hidden="true" size={15}/></summary><fieldset className="sa-filter-choice-group" aria-label="Material">{materials.map(option => <label key={option}><input type="radio" name="material" checked={material === option} onChange={() => setMaterial(option)}/><span>{option === "925 Sterling Silver" ? "925 Sterling Silver (solid)" : "Silver Plated"}</span></label>)}</fieldset></details>
-      <details className="sa-filter-accordion" open><summary><span>Occasion</span><ChevronDown aria-hidden="true" size={15}/></summary><fieldset className="sa-filter-choice-group" aria-label="Occasion">{occasionOptions.map(option => <label key={option}><input type="radio" name="occasion" checked={occasion === option} onChange={() => setOccasion(option)}/><span>{option}</span></label>)}</fieldset></details>
+      {(category === "Rings" || category === "Bracelets") && <details className="sa-filter-accordion" open><summary><span>For</span><ChevronDown aria-hidden="true" size={15}/></summary><fieldset className="sa-filter-choice-group" aria-label="Gender"><label><input type="radio" name="gender" checked={!gender} onChange={() => setGender("")}/><span>All</span></label><label><input type="radio" name="gender" checked={gender === "Male"} onChange={() => setGender("Male")}/><span>Male</span></label><label><input type="radio" name="gender" checked={gender === "Female"} onChange={() => setGender("Female")}/><span>Female</span></label></fieldset></details>}
       <details className="sa-filter-accordion" open><summary><span>Price range</span><ChevronDown aria-hidden="true" size={15}/></summary><fieldset className="sa-filter-choice-group" aria-label="Price range">{priceRanges.map(range => <label key={range.label}><input type="radio" name="priceRange" checked={selectedPriceRange === range.label} onChange={() => selectPriceRange(range)}/><span>{range.label}</span></label>)}</fieldset><div className="sa-price-fields"><span>Custom price (₹)</span><div><input type="number" min="0" placeholder="Minimum" value={minPrice} onChange={e => { setMinPrice(e.target.value); setSelectedPriceRange(""); }}/><input type="number" min="0" placeholder="Maximum" value={maxPrice} onChange={e => { setMaxPrice(e.target.value); setSelectedPriceRange(""); }}/></div></div></details>
     </>
   );

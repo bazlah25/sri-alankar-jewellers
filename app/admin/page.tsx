@@ -10,6 +10,7 @@ import { formatPrice, type Product } from "@/data/products";
 const categories: Product["category"][] = ["Necklaces", "Earrings", "Rings", "Bracelets", "Anklets", "Sets"];
 const materials: Product["material"][] = ["925 Sterling Silver", "Silver Plated"];
 const occasions = ["Everyday", "Celebration", "Gifting"];
+type StoreOrder = { id: string; created_at: string; status: string; payment_method: string; customer: { firstName: string; lastName: string; email: string; phone: string; address: string; addressLine2?: string; city: string; state: string; pincode: string }; items: { name: string; price: number; quantity: number }[]; total: number };
 
 function slugify(value: string) {
   return value.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -48,6 +49,7 @@ export default function AdminPage() {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState<Product["category"]>("Necklaces");
+  const [gender, setGender] = useState<Product["gender"]>("Unisex");
   const [material, setMaterial] = useState<Product["material"]>("925 Sterling Silver");
   const [style, setStyle] = useState("");
   const [selectedOccasions, setSelectedOccasions] = useState<string[]>(["Everyday"]);
@@ -59,6 +61,8 @@ export default function AdminPage() {
   const [search, setSearch] = useState("");
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
+  const [orders, setOrders] = useState<StoreOrder[]>([]);
+  const [ordersError, setOrdersError] = useState("");
 
   useEffect(() => {
     let active = true;
@@ -67,6 +71,17 @@ export default function AdminPage() {
       .catch(() => { if (active) setAuthState("signed-out"); });
     return () => { active = false; };
   }, []);
+
+  useEffect(() => {
+    if (authState !== "signed-in") return;
+    fetch("/api/admin/orders", { cache: "no-store" })
+      .then(async response => {
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message || "Could not load orders.");
+        setOrders(Array.isArray(result.orders) ? result.orders : []);
+      })
+      .catch(reason => setOrdersError(reason instanceof Error ? reason.message : "Could not load orders."));
+  }, [authState]);
 
   const visibleProducts = useMemo(() => products.filter(product =>
     [product.name, product.category, product.id].join(" ").toLowerCase().includes(search.toLowerCase().trim())
@@ -86,7 +101,7 @@ export default function AdminPage() {
     }
   };
 
-  const submitProduct = (event: FormEvent<HTMLFormElement>) => {
+  const submitProduct = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
     if (!image) { setError("Upload a product image before adding this item."); return; }
@@ -99,6 +114,7 @@ export default function AdminPage() {
       id,
       name: productName,
       category,
+      ...((category === "Rings" || category === "Bracelets") ? { gender } : {}),
       price: numericPrice,
       material,
       style: style.trim() || "Classic",
@@ -109,8 +125,8 @@ export default function AdminPage() {
       isBestseller,
       collectionSlugs: selectedOccasions.includes("Gifting") ? ["gifting-edit"] : [],
     };
-    addProduct(product);
-    setName(""); setPrice(""); setCategory("Necklaces"); setMaterial("925 Sterling Silver");
+    try { await addProduct(product); } catch (reason) { setError(reason instanceof Error ? reason.message : "Could not save this product."); return; }
+    setName(""); setPrice(""); setCategory("Necklaces"); setGender("Unisex"); setMaterial("925 Sterling Silver");
     setStyle(""); setSelectedOccasions(["Everyday"]); setAvailable(true); setIsNew(true); setIsBestseller(false);
     setImage(""); setImageName(""); setNotice(`${productName} added to the catalogue.`);
     const input = document.getElementById("product-image-upload") as HTMLInputElement | null;
@@ -135,13 +151,13 @@ export default function AdminPage() {
     setAuthState("signed-out"); setPassword(""); setEditingProduct(null);
   };
 
-  const saveEdit = (event: FormEvent<HTMLFormElement>) => {
+  const saveEdit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!editingProduct || !editingProduct.name.trim() || !Number.isFinite(editingProduct.price) || editingProduct.price <= 0) { setEditError("Add a product name and a valid price."); return; }
     const collectionSlugs = editingProduct.occasions.includes("Gifting")
       ? Array.from(new Set([...editingProduct.collectionSlugs.filter(slug => slug !== "gifting-edit"), "gifting-edit"]))
       : editingProduct.collectionSlugs.filter(slug => slug !== "gifting-edit");
-    updateProduct(editingProduct.id, { ...editingProduct, name: editingProduct.name.trim(), collectionSlugs });
+    try { await updateProduct(editingProduct.id, { ...editingProduct, name: editingProduct.name.trim(), collectionSlugs }); } catch (reason) { setEditError(reason instanceof Error ? reason.message : "Could not update this product."); return; }
     setNotice(`${editingProduct.name} updated.`); setEditingProduct(null); setEditError("");
     window.setTimeout(() => setNotice(""), 3500);
   };
@@ -167,7 +183,7 @@ export default function AdminPage() {
           <form className="sa-admin-form" onSubmit={submitProduct}>
             <label className="sa-admin-upload" htmlFor="product-image-upload">{image ? <div className="sa-admin-image-preview"><Image src={image} alt="Uploaded product preview" fill sizes="220px" unoptimized/></div> : <div className="sa-admin-upload-prompt"><ImagePlus size={25}/><strong>Upload product image</strong><span>JPG, PNG, or WebP · up to 12 MB</span><span className="sa-admin-upload-button"><Upload size={14}/> CHOOSE IMAGE</span></div>}<input id="product-image-upload" type="file" accept="image/png,image/jpeg,image/webp,image/avif" onChange={handleImage}/></label>
             {imageName && <p className="sa-admin-file-name"><Check size={13}/>{imageName}</p>}
-            <div className="sa-admin-fields"><label className="sa-admin-wide">Product name<input required maxLength={90} value={name} onChange={event => setName(event.target.value)} placeholder="e.g. Moonstone Pendant Necklace"/></label><label>Price (₹)<input type="number" min="1" step="1" required value={price} onChange={event => setPrice(event.target.value)} placeholder="2499"/></label><label>Category<select value={category} onChange={event => setCategory(event.target.value as Product["category"])}>{categories.map(value => <option key={value}>{value}</option>)}</select></label><label className="sa-admin-wide">Material<select value={material} onChange={event => setMaterial(event.target.value as Product["material"])}>{materials.map(value => <option key={value}>{value}</option>)}</select></label><label className="sa-admin-wide">Style<input maxLength={60} value={style} onChange={event => setStyle(event.target.value)} placeholder="e.g. Minimal, Floral, Statement"/></label></div>
+            <div className="sa-admin-fields"><label className="sa-admin-wide">Product name<input required maxLength={90} value={name} onChange={event => setName(event.target.value)} placeholder="e.g. Moonstone Pendant Necklace"/></label><label>Price (₹)<input type="number" min="1" step="1" required value={price} onChange={event => setPrice(event.target.value)} placeholder="2499"/></label><label>Category<select value={category} onChange={event => setCategory(event.target.value as Product["category"])}>{categories.map(value => <option key={value}>{value}</option>)}</select></label>{(category === "Rings" || category === "Bracelets") && <label>For<select value={gender} onChange={event => setGender(event.target.value as Product["gender"])}><option>Unisex</option><option>Male</option><option>Female</option></select></label>}<label className="sa-admin-wide">Material<select value={material} onChange={event => setMaterial(event.target.value as Product["material"])}>{materials.map(value => <option key={value}>{value}</option>)}</select></label><label className="sa-admin-wide">Style<input maxLength={60} value={style} onChange={event => setStyle(event.target.value)} placeholder="e.g. Minimal, Floral, Statement"/></label></div>
             <fieldset className="sa-admin-checks"><legend>Occasions</legend>{occasions.map(value => <label key={value}><input type="checkbox" checked={selectedOccasions.includes(value)} onChange={() => toggleOccasion(value)}/><span>{value}</span></label>)}</fieldset>
             <fieldset className="sa-admin-checks sa-admin-flags"><legend>Store settings</legend><label><input type="checkbox" checked={available} onChange={event => setAvailable(event.target.checked)}/><span>In stock</span></label><label><input type="checkbox" checked={isNew} onChange={event => setIsNew(event.target.checked)}/><span>Show in New In</span></label><label><input type="checkbox" checked={isBestseller} onChange={event => setIsBestseller(event.target.checked)}/><span>Bestseller</span></label></fieldset>
             {error && <p className="sa-admin-error" role="alert">{error}</p>}
@@ -175,12 +191,15 @@ export default function AdminPage() {
           </form>
         </section>
         <section className="sa-admin-panel sa-admin-inventory"><div className="sa-admin-inventory-heading"><div><h2>Catalogue</h2><p>{visibleProducts.length} products</p></div><label className="sa-admin-search"><Search size={15}/><input aria-label="Search catalogue" placeholder="Search products" value={search} onChange={event => setSearch(event.target.value)}/></label></div>
-          {!loaded ? <div className="sa-admin-loading">Loading catalogue…</div> : visibleProducts.length ? <div className="sa-admin-product-list">{visibleProducts.map(product => <article className="sa-admin-product-row" key={product.id}><div className="sa-admin-product-thumb"><Image src={product.image} alt="" fill sizes="52px" unoptimized/></div><div className="sa-admin-product-info"><h3>{product.name}</h3><span>{product.category} · {formatPrice(product.price)}</span></div><span className={`sa-admin-stock ${product.available ? "in-stock" : "out-stock"}`}>{product.available ? "In stock" : "Sold out"}</span><div className="sa-admin-row-actions"><button className="sa-admin-edit" type="button" onClick={() => { setEditingProduct({ ...product }); setEditError(""); }}> <Pencil size={13}/> EDIT</button>{customProducts.some(item => item.id === product.id) ? <button className="sa-admin-delete" type="button" aria-label={`Remove ${product.name}`} onClick={() => removeProduct(product.id)}><Trash2 size={15}/></button> : <span className="sa-admin-base-tag">STORE</span>}</div></article>)}</div> : <div className="sa-admin-empty"><p>No products match your search.</p></div>}
+          {!loaded ? <div className="sa-admin-loading">Loading catalogue…</div> : visibleProducts.length ? <div className="sa-admin-product-list">{visibleProducts.map(product => <article className="sa-admin-product-row" key={product.id}><div className="sa-admin-product-thumb"><Image src={product.image} alt="" fill sizes="52px" unoptimized/></div><div className="sa-admin-product-info"><h3>{product.name}</h3><span>{product.category} · {formatPrice(product.price)}</span></div><span className={`sa-admin-stock ${product.available ? "in-stock" : "out-stock"}`}>{product.available ? "In stock" : "Sold out"}</span><div className="sa-admin-row-actions"><button className="sa-admin-edit" type="button" onClick={() => { setEditingProduct({ ...product }); setEditError(""); }}> <Pencil size={13}/> EDIT</button>{customProducts.some(item => item.id === product.id) ? <button className="sa-admin-delete" type="button" aria-label={`Remove ${product.name}`} onClick={async () => { try { await removeProduct(product.id); } catch (reason) { setError(reason instanceof Error ? reason.message : "Could not remove this product."); } }}><Trash2 size={15}/></button> : <span className="sa-admin-base-tag">STORE</span>}</div></article>)}</div> : <div className="sa-admin-empty"><p>No products match your search.</p></div>}
         </section>
       </div>
-      <p className="sa-admin-storage-note">Demo admin: uploads are saved in local storage in this browser only. Connect a product database and staff sign-in before using it as a live store admin.</p>
+      <section className="sa-admin-panel sa-admin-orders"><div className="sa-admin-inventory-heading"><div><h2>Recent orders</h2><p>Latest orders saved in the store database</p></div><span className="sa-admin-base-tag">{orders.length} ORDERS</span></div>
+        {ordersError ? <p className="sa-admin-storage-note">{ordersError}</p> : orders.length ? <div className="sa-admin-order-list">{orders.map(order => <article key={order.id} className="sa-admin-order-row"><div className="sa-admin-order-main"><strong>#{order.id.slice(0, 8).toUpperCase()} · {order.customer.firstName} {order.customer.lastName}</strong><span>{new Date(order.created_at).toLocaleString("en-IN")} · {order.status} · {order.payment_method.toUpperCase()}</span><span>{order.customer.email} · {order.customer.phone}</span><span>{order.customer.address}{order.customer.addressLine2 ? `, ${order.customer.addressLine2}` : ""}, {order.customer.city}, {order.customer.state} {order.customer.pincode}</span><span>{order.items.map(item => `${item.name} × ${item.quantity}`).join(" · ")}</span></div><strong>{formatPrice(order.total)}</strong></article>)}</div> : <p className="sa-admin-storage-note">No database orders yet. Orders will appear here after checkout is connected.</p>}
+      </section>
+        <p className="sa-admin-storage-note">When Supabase is configured, product edits and orders are shared through the store database. Without database settings, catalogue changes remain in this browser only.</p>
     </section>
-    {editingProduct && <div className="sa-admin-modal-backdrop" onMouseDown={event => { if (event.target === event.currentTarget) setEditingProduct(null); }}><section className="sa-admin-edit-modal" role="dialog" aria-modal="true" aria-labelledby="edit-product-title"><header><div><span className="sa-eyebrow">CATALOGUE UPDATE</span><h2 id="edit-product-title">Edit product</h2></div><button type="button" aria-label="Close edit product" onClick={() => setEditingProduct(null)}><X size={19}/></button></header><form className="sa-admin-form" onSubmit={saveEdit}><label className="sa-admin-edit-image">{editingProduct.image ? <Image src={editingProduct.image} alt="Product preview" fill sizes="180px" unoptimized/> : <ImagePlus size={22}/>}<span>CHANGE IMAGE</span><input type="file" accept="image/png,image/jpeg,image/webp,image/avif" onChange={async event => { const file = event.target.files?.[0]; if (!file) return; if (file.size > 12 * 1024 * 1024) { setEditError("Choose an image smaller than 12 MB."); return; } try { const updatedImage = await readImage(file); setEditingProduct(current => current ? { ...current, image: updatedImage } : current); setEditError(""); } catch { setEditError("Could not process this image."); } }}/></label><div className="sa-admin-fields"><label className="sa-admin-wide">Product name<input required maxLength={90} value={editingProduct.name} onChange={event => setEditingProduct(current => current ? { ...current, name: event.target.value } : current)}/></label><label>Price (₹)<input type="number" min="1" step="1" required value={editingProduct.price} onChange={event => setEditingProduct(current => current ? { ...current, price: Number(event.target.value) } : current)}/></label><label>Category<select value={editingProduct.category} onChange={event => setEditingProduct(current => current ? { ...current, category: event.target.value as Product["category"] } : current)}>{categories.map(value => <option key={value}>{value}</option>)}</select></label><label className="sa-admin-wide">Material<select value={editingProduct.material} onChange={event => setEditingProduct(current => current ? { ...current, material: event.target.value as Product["material"] } : current)}>{materials.map(value => <option key={value}>{value}</option>)}</select></label><label className="sa-admin-wide">Style<input maxLength={60} value={editingProduct.style} onChange={event => setEditingProduct(current => current ? { ...current, style: event.target.value } : current)}/></label></div><fieldset className="sa-admin-checks"><legend>Occasions</legend>{occasions.map(value => <label key={value}><input type="checkbox" checked={editingProduct.occasions.includes(value)} onChange={event => setEditingProduct(current => current ? { ...current, occasions: event.target.checked ? [...current.occasions, value] : current.occasions.filter(item => item !== value) } : current)}/><span>{value}</span></label>)}</fieldset><fieldset className="sa-admin-checks sa-admin-flags"><legend>Store settings</legend><label><input type="checkbox" checked={editingProduct.available} onChange={event => setEditingProduct(current => current ? { ...current, available: event.target.checked } : current)}/><span>In stock</span></label><label><input type="checkbox" checked={Boolean(editingProduct.isNew)} onChange={event => setEditingProduct(current => current ? { ...current, isNew: event.target.checked } : current)}/><span>Show in New In</span></label><label><input type="checkbox" checked={Boolean(editingProduct.isBestseller)} onChange={event => setEditingProduct(current => current ? { ...current, isBestseller: event.target.checked } : current)}/><span>Bestseller</span></label></fieldset>{editError && <p className="sa-admin-error" role="alert">{editError}</p>}<button className="sa-admin-submit" type="submit"><Check size={15}/> SAVE CHANGES</button></form></section></div>}
+    {editingProduct && <div className="sa-admin-modal-backdrop" onMouseDown={event => { if (event.target === event.currentTarget) setEditingProduct(null); }}><section className="sa-admin-edit-modal" role="dialog" aria-modal="true" aria-labelledby="edit-product-title"><header><div><span className="sa-eyebrow">CATALOGUE UPDATE</span><h2 id="edit-product-title">Edit product</h2></div><button type="button" aria-label="Close edit product" onClick={() => setEditingProduct(null)}><X size={19}/></button></header><form className="sa-admin-form" onSubmit={saveEdit}><label className="sa-admin-edit-image">{editingProduct.image ? <Image src={editingProduct.image} alt="Product preview" fill sizes="180px" unoptimized/> : <ImagePlus size={22}/>}<span>CHANGE IMAGE</span><input type="file" accept="image/png,image/jpeg,image/webp,image/avif" onChange={async event => { const file = event.target.files?.[0]; if (!file) return; if (file.size > 12 * 1024 * 1024) { setEditError("Choose an image smaller than 12 MB."); return; } try { const updatedImage = await readImage(file); setEditingProduct(current => current ? { ...current, image: updatedImage } : current); setEditError(""); } catch { setEditError("Could not process this image."); } }}/></label><div className="sa-admin-fields"><label className="sa-admin-wide">Product name<input required maxLength={90} value={editingProduct.name} onChange={event => setEditingProduct(current => current ? { ...current, name: event.target.value } : current)}/></label><label>Price (₹)<input type="number" min="1" step="1" required value={editingProduct.price} onChange={event => setEditingProduct(current => current ? { ...current, price: Number(event.target.value) } : current)}/></label><label>Category<select value={editingProduct.category} onChange={event => setEditingProduct(current => current ? { ...current, category: event.target.value as Product["category"] } : current)}>{categories.map(value => <option key={value}>{value}</option>)}</select></label>{(editingProduct.category === "Rings" || editingProduct.category === "Bracelets") && <label>For<select value={editingProduct.gender || "Unisex"} onChange={event => setEditingProduct(current => current ? { ...current, gender: event.target.value as Product["gender"] } : current)}><option>Unisex</option><option>Male</option><option>Female</option></select></label>}<label className="sa-admin-wide">Material<select value={editingProduct.material} onChange={event => setEditingProduct(current => current ? { ...current, material: event.target.value as Product["material"] } : current)}>{materials.map(value => <option key={value}>{value}</option>)}</select></label><label className="sa-admin-wide">Style<input maxLength={60} value={editingProduct.style} onChange={event => setEditingProduct(current => current ? { ...current, style: event.target.value } : current)}/></label></div><fieldset className="sa-admin-checks"><legend>Occasions</legend>{occasions.map(value => <label key={value}><input type="checkbox" checked={editingProduct.occasions.includes(value)} onChange={event => setEditingProduct(current => current ? { ...current, occasions: event.target.checked ? [...current.occasions, value] : current.occasions.filter(item => item !== value) } : current)}/><span>{value}</span></label>)}</fieldset><fieldset className="sa-admin-checks sa-admin-flags"><legend>Store settings</legend><label><input type="checkbox" checked={editingProduct.available} onChange={event => setEditingProduct(current => current ? { ...current, available: event.target.checked } : current)}/><span>In stock</span></label><label><input type="checkbox" checked={Boolean(editingProduct.isNew)} onChange={event => setEditingProduct(current => current ? { ...current, isNew: event.target.checked } : current)}/><span>Show in New In</span></label><label><input type="checkbox" checked={Boolean(editingProduct.isBestseller)} onChange={event => setEditingProduct(current => current ? { ...current, isBestseller: event.target.checked } : current)}/><span>Bestseller</span></label></fieldset>{editError && <p className="sa-admin-error" role="alert">{editError}</p>}<button className="sa-admin-submit" type="submit"><Check size={15}/> SAVE CHANGES</button></form></section></div>}
     {notice && <div className="sa-admin-toast" role="status"><Check size={15}/>{notice}</div>}
   </main>;
 }

@@ -7,9 +7,9 @@ type ProductCatalogState = {
   products: Product[];
   customProducts: Product[];
   loaded: boolean;
-  addProduct: (product: Product) => void;
-  updateProduct: (productId: string, update: Partial<Product>) => void;
-  removeProduct: (productId: string) => void;
+  addProduct: (product: Product) => Promise<void>;
+  updateProduct: (productId: string, update: Partial<Product>) => Promise<void>;
+  removeProduct: (productId: string) => Promise<void>;
 };
 
 const ProductCatalogContext = createContext<ProductCatalogState | null>(null);
@@ -28,9 +28,11 @@ function isProduct(value: unknown): value is Product {
 export function ProductCatalogProvider({ children }: { children: ReactNode }) {
   const [customProducts, setCustomProducts] = useState<Product[]>([]);
   const [overrides, setOverrides] = useState<Record<string, Partial<Product>>>({});
+  const [remoteProducts, setRemoteProducts] = useState<Product[] | null>(null);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
+    let active = true;
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
@@ -45,25 +47,56 @@ export function ProductCatalogProvider({ children }: { children: ReactNode }) {
     } catch {
       try { localStorage.removeItem(STORAGE_KEY); } catch { /* Storage may be unavailable. */ }
     }
-    setLoaded(true);
+    fetch("/api/products", { cache: "no-store" })
+      .then(async response => response.ok ? response.json() : null)
+      .then(result => {
+        if (active && result?.configured && Array.isArray(result.products)) setRemoteProducts(result.products.filter(isProduct));
+      })
+      .catch(() => undefined)
+      .finally(() => { if (active) setLoaded(true); });
+    return () => { active = false; };
   }, []);
 
   useEffect(() => {
-    if (!loaded) return;
+    if (!loaded || remoteProducts) return;
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ customProducts, overrides })); } catch { /* Keep the in-memory catalog usable if storage is full. */ }
-  }, [customProducts, overrides, loaded]);
+  }, [customProducts, overrides, loaded, remoteProducts]);
 
   const value = useMemo<ProductCatalogState>(() => ({
-    products: [...baseProducts.map(product => ({ ...product, ...overrides[product.id] })), ...customProducts.map(product => ({ ...product, ...overrides[product.id] }))],
-    customProducts,
+    products: remoteProducts || [...baseProducts.map(product => ({ ...product, ...overrides[product.id] })), ...customProducts.map(product => ({ ...product, ...overrides[product.id] }))],
+    customProducts: remoteProducts ? remoteProducts.filter(product => !baseProducts.some(base => base.id === product.id)) : customProducts,
     loaded,
-    addProduct: product => setCustomProducts(current => [product, ...current.filter(item => item.id !== product.id)]),
-    updateProduct: (productId, update) => setOverrides(current => ({ ...current, [productId]: { ...current[productId], ...update } })),
-    removeProduct: productId => {
-      setCustomProducts(current => current.filter(item => item.id !== productId));
-      setOverrides(current => { const next = { ...current }; delete next[productId]; return next; });
+    addProduct: async product => {
+      if (remoteProducts) {
+        const response = await fetch("/api/admin/products", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(product) });
+        if (!response.ok) throw new Error((await response.json()).message || "Could not save the product.");
+        setRemoteProducts(current => [product, ...(current || []).filter(item => item.id !== product.id)]);
+      } else setCustomProducts(current => [product, ...current.filter(item => item.id !== product.id)]);
     },
-  }), [customProducts, overrides, loaded]);
+    updateProduct: async (productId, update) => {
+      const currentProducts = remoteProducts || [...baseProducts.map(product => ({ ...product, ...overrides[product.id] })), ...customProducts.map(product => ({ ...product, ...overrides[product.id] }))];
+      const currentProduct = currentProducts.find(product => product.id === productId);
+      if (!currentProduct) throw new Error("Product no longer exists.");
+      const updated = { ...currentProduct, ...update };
+      if (remoteProducts) {
+        const response = await fetch("/api/admin/products", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(updated) });
+        if (!response.ok) throw new Error((await response.json()).message || "Could not update the product.");
+        setRemoteProducts(current => (current || []).map(product => product.id === productId ? updated : product));
+      } else if (customProducts.some(product => product.id === productId)) {
+        setCustomProducts(current => current.map(product => product.id === productId ? updated : product));
+      } else setOverrides(current => ({ ...current, [productId]: { ...current[productId], ...update } }));
+    },
+    removeProduct: async productId => {
+      if (remoteProducts) {
+        const response = await fetch(`/api/admin/products?id=${encodeURIComponent(productId)}`, { method: "DELETE" });
+        if (!response.ok) throw new Error((await response.json()).message || "Could not remove the product.");
+        setRemoteProducts(current => (current || []).filter(item => item.id !== productId));
+      } else {
+        setCustomProducts(current => current.filter(item => item.id !== productId));
+        setOverrides(current => { const next = { ...current }; delete next[productId]; return next; });
+      }
+    },
+  }), [customProducts, overrides, remoteProducts, loaded]);
 
   return <ProductCatalogContext.Provider value={value}>{children}</ProductCatalogContext.Provider>;
 }

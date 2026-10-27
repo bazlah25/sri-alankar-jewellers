@@ -2,6 +2,7 @@ export type Product = {
   id: string;
   name: string;
   category: "Necklaces" | "Earrings" | "Rings" | "Bracelets" | "Anklets" | "Sets";
+  gender?: "Male" | "Female" | "Unisex";
   price: number;
   material: "925 Sterling Silver" | "Silver Plated";
   style: string;
@@ -29,13 +30,13 @@ export const products: Product[] = [
   },
   {
     id: "everyday-twist-ring", name: "Everyday Twist Ring", category: "Rings",
-    price: 1699, material: "925 Sterling Silver", style: "Minimal", occasions: ["Everyday", "Gifting"],
+    price: 1699, material: "925 Sterling Silver", style: "Minimal", gender: "Female", occasions: ["Everyday", "Gifting"],
     available: true, image: "https://images.unsplash.com/photo-1624588057318-5f1b2eb81012?auto=format&fit=crop&w=900&q=85",
     collectionSlugs: ["everyday-edit", "timeless-collection"]
   },
   {
     id: "leaf-bracelet", name: "Leaf Bracelet", category: "Bracelets",
-    price: 2299, material: "925 Sterling Silver", style: "Nature-inspired", occasions: ["Everyday", "Celebration"],
+    price: 2299, material: "925 Sterling Silver", style: "Nature-inspired", gender: "Female", occasions: ["Everyday", "Celebration"],
     available: true, image: "https://images.unsplash.com/photo-1744722093742-aad22c7fa68b?auto=format&fit=crop&w=900&q=85",
     collectionSlugs: ["everyday-edit", "celebration-edit", "silver-wardrobe"]
   },
@@ -59,7 +60,7 @@ export const products: Product[] = [
   },
   {
     id: "sculpted-ring", name: "Sculpted Statement Ring", category: "Rings",
-    price: 2799, material: "Silver Plated", style: "Statement", occasions: ["Celebration"],
+    price: 2799, material: "Silver Plated", style: "Statement", gender: "Female", occasions: ["Celebration"],
     available: true, image: "https://images.unsplash.com/photo-1550368566-f9cc32d7392d?auto=format&fit=crop&w=900&q=85",
     collectionSlugs: ["celebration-edit", "statement-edit"]
   },
@@ -77,13 +78,13 @@ export const products: Product[] = [
   },
   {
     id: "silver-bangle", name: "Classic Silver Bangle", category: "Bracelets",
-    price: 2499, material: "925 Sterling Silver", style: "Classic", occasions: ["Everyday", "Celebration"],
+    price: 2499, material: "925 Sterling Silver", style: "Classic", gender: "Female", occasions: ["Everyday", "Celebration"],
     available: false, image: "https://images.unsplash.com/photo-1581522723372-e1a239e7ed2d?auto=format&fit=crop&w=900&q=85",
     collectionSlugs: ["celebration-edit", "timeless-collection"]
   },
   {
     id: "stacking-ring", name: "Silver Stacking Ring", category: "Rings",
-    price: 1299, material: "925 Sterling Silver", style: "Minimal", occasions: ["Everyday", "Gifting"],
+    price: 1299, material: "925 Sterling Silver", style: "Minimal", gender: "Female", occasions: ["Everyday", "Gifting"],
     available: true, image: "https://images.unsplash.com/photo-1599707367072-cd6ada2bc375?auto=format&fit=crop&w=900&q=85",
     collectionSlugs: ["everyday-edit", "silver-wardrobe"]
   }
