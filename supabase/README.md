@@ -6,4 +6,4 @@
 
 The storefront reads only rows in `products`; it does not seed or append built-in demo products. Add catalogue items through `/admin`. Checkout stores Cash on Delivery orders and their customer, delivery, item, and price snapshots in `orders`. Online payment is not connected.
 
-The admin storefront image section saves compressed hero images in the `storefront_settings` table for the homepage, All Jewellery, New In, and each of the six jewellery category pages.
+The admin storefront image section saves compressed desktop and mobile hero images in the `storefront_settings` table for the homepage, All Jewellery, New In, and the necklace, earrings, rings, and bracelets pages. Photo Frames and Pooja Essentials images are used on their homepage category cards.

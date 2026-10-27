@@ -13,18 +13,18 @@ import {
 } from "lucide-react";
 
 const categories = [
-  { name: "Necklace", href: "/jewellery/necklaces", image: "/categories/necklace-category.jpg" },
-  { name: "Earrings", href: "/jewellery/earrings", image: "/categories/earrings-category.jpg" },
-  { name: "Rings", href: "/jewellery/rings", image: "/categories/rings-category.jpg" },
-  { name: "Bracelets", href: "/jewellery/bracelets", image: "/categories/bracelet-category.jpg" },
-  { name: "Photo Frames", href: "/jewellery", image: "/categories/photo-frames-category.jpg" },
-  { name: "Pooja Essentials", href: "/jewellery", image: "/categories/pooja-essentials-category.jpg" },
+  { name: "Necklace", href: "/jewellery/necklaces", imageKey: "category:necklaces", image: "/categories/necklace-category.jpg" },
+  { name: "Earrings", href: "/jewellery/earrings", imageKey: "category:earrings", image: "/categories/earrings-category.jpg" },
+  { name: "Rings", href: "/jewellery/rings", imageKey: "category:rings", image: "/categories/rings-category.jpg" },
+  { name: "Bracelets", href: "/jewellery/bracelets", imageKey: "category:bracelets", image: "/categories/bracelet-category.jpg" },
+  { name: "Photo Frames", href: "/jewellery", imageKey: "category:photo-frames", image: "/categories/photo-frames-category.jpg" },
+  { name: "Pooja Essentials", href: "/jewellery", imageKey: "category:pooja-essentials", image: "/categories/pooja-essentials-category.jpg" },
 ];
 
-function Photo({ src, alt, className = "" }: { src: string; alt: string; className?: string }) {
+function Photo({ src, alt, className = "", imageKey }: { src: string; alt: string; className?: string; imageKey?: string }) {
   return (
     <div className={`photo ${className}`}>
-      <Image src={src} alt={alt} fill sizes="(max-width: 700px) 50vw, 25vw" unoptimized />
+      {imageKey ? <StorefrontHeroImage imageKey={imageKey} alt={alt} sizes="(max-width: 700px) 50vw, 25vw" /> : <Image src={src} alt={alt} fill sizes="(max-width: 700px) 50vw, 25vw" unoptimized />}
     </div>
   );
 }
@@ -98,7 +98,7 @@ export default function HomePage() {
       {notice && <div className="notice" role="status">{notice}<button onClick={() => setNotice("")} aria-label="Dismiss"><X size={16}/></button></div>}
 
       <section className="hero">
-        <StorefrontHeroImage imageKey="home" fallbackSrc="/home-hero-luxury-jewellery.png" alt="Silver jewellery campaign" priority />
+        <StorefrontHeroImage imageKey="home" alt="Silver jewellery campaign" priority className="home" />
         <div className="hero-wash" />
         <div className="hero-copy">
           <p className="eyebrow">SRI ALANKAR JEWELLERS</p>
@@ -117,7 +117,7 @@ export default function HomePage() {
         <div className="category-grid">
           {categories.map(category => (
             <a className="category-card" href={category.href} key={category.name}>
-              <Photo src={category.image} alt={category.name} />
+              <Photo src={category.image} alt={category.name} imageKey={category.imageKey} />
               <span>{category.name}</span>
             </a>
           ))}

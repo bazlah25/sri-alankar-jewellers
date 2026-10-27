@@ -18,7 +18,7 @@ export default async function JewelleryPage({ searchParams }: { searchParams: Pr
     <main className="sa-page">
       <SiteHeader/>
       <section className="sa-page-hero sa-jewellery-hero">
-        <StorefrontHeroImage imageKey="all-jewellery" fallbackSrc="https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=2000&q=85" alt="Silver jewellery collection" priority />
+        <StorefrontHeroImage imageKey="all-jewellery" alt="Silver jewellery collection" priority />
         <div className="sa-page-hero-wash"/>
         <div className="sa-page-hero-copy"><span className="sa-eyebrow">THE SILVER EDIT</span><h1>Explore Our<br/><em>Jewellery</em></h1><p>Timeless silver. Made to be yours.</p></div>
       </section>

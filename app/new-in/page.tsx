@@ -12,7 +12,7 @@ export default function NewInPage() {
     <main className="sa-page">
       <SiteHeader />
       <section className="sa-page-hero sa-jewellery-hero">
-        <StorefrontHeroImage imageKey="new-in" fallbackSrc="https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=2000&q=85" alt="New silver jewellery arrivals" priority />
+        <StorefrontHeroImage imageKey="new-in" alt="New silver jewellery arrivals" priority />
         <div className="sa-page-hero-wash" />
         <div className="sa-page-hero-copy"><span className="sa-eyebrow">FRESH FROM THE ATELIER</span><h1>New <em>In</em></h1><p>Discover the latest silver pieces, made for your moments.</p></div>
       </section>

@@ -4,8 +4,7 @@
 .sa-page-hero, .sa-collections-hero, .sa-detail-hero { position: relative; overflow: hidden; isolation: isolate; background: #eee7d6; }
 .sa-page-hero { height: clamp(300px, 32vw, 440px); }
 .sa-page-hero > img, .sa-collections-hero > img, .sa-detail-hero > img { object-fit: cover; }
-.sa-jewellery-hero > img { object-position: center 48%; }
-.sa-jewellery-hero > .sa-managed-hero-image { object-fit: cover; }
+.sa-jewellery-hero > .sa-managed-hero-picture > img { object-position: center 48%; }
 .sa-page-hero-wash { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(244,233,220,.96), rgba(244,233,220,.78) 38%, rgba(244,233,220,.08) 75%); }
 .sa-page-hero-copy { position: absolute; left: 8%; top: 50%; transform: translateY(-50%); }
 .sa-page-hero-copy h1, .sa-collections-hero-copy h1, .sa-detail-hero-copy h1 { font-family: "Playfair Display", Georgia, serif; font-size: clamp(42px, 5.2vw, 72px); font-weight: 400; line-height: .98; letter-spacing: -1.8px; margin: 0 0 15px; }
@@ -491,13 +490,19 @@
 .sa-admin-storefront-images .sa-admin-panel-heading { margin-bottom: 18px; }
 .sa-admin-hero-image-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 13px; }
 .sa-admin-hero-image-card { min-width: 0; overflow: hidden; border: 1px solid #e7dfca; background: #fffdf8; }
-.sa-admin-hero-image-preview { position: relative; display: grid; aspect-ratio: 16 / 8; place-items: center; overflow: hidden; background: #f4f0e6; }
+.sa-admin-hero-image-title { display: grid; gap: 4px; padding: 11px 10px 8px; }
+.sa-admin-hero-image-title strong { color: #182642; font-size: 10px; font-weight: 500; }
+.sa-admin-hero-image-title span { color: #747e8e; font-size: 8px; }
+.sa-admin-hero-image-devices { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 7px; padding: 0 8px 9px; }
+.sa-admin-hero-image-device { min-width: 0; border: 1px solid #eee8d9; }
+.sa-admin-hero-image-preview { position: relative; display: grid; aspect-ratio: 16 / 9; place-items: center; overflow: hidden; background: #f4f0e6; }
+.sa-admin-hero-image-preview.mobile { aspect-ratio: 4 / 5; }
 .sa-admin-hero-image-preview > img { object-fit: cover; }
 .sa-admin-hero-image-preview > div { display: grid; justify-items: center; gap: 7px; color: #8a8d91; font-size: 9px; }
 .sa-admin-image-busy { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 7px; background: rgba(11,31,74,.72); color: white; font-size: 10px; }
-.sa-admin-hero-image-copy { display: flex; align-items: center; gap: 7px; padding: 10px; }
+.sa-admin-hero-image-copy { display: flex; align-items: center; gap: 5px; padding: 6px; }
 .sa-admin-hero-image-copy > div { display: grid; flex: 1; min-width: 0; gap: 4px; }
-.sa-admin-hero-image-copy strong { color: #182642; font-size: 10px; font-weight: 500; }
+.sa-admin-hero-image-copy > strong { flex: 1; color: #182642; font-size: 8px; font-weight: 500; }
 .sa-admin-hero-image-copy span { color: #747e8e; font-size: 8px; }
 .sa-admin-hero-image-upload { position: relative; display: grid; min-height: 29px; place-items: center; padding: 0 9px; border: 1px solid #d9c696; color: #182642; font-size: 8px; letter-spacing: .5px; cursor: pointer; }
 .sa-admin-hero-image-upload input { position: absolute; width: 1px; height: 1px; opacity: 0; }
