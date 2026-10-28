@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { usePathname } from "next/navigation";
 
 type HeroAsset = { desktop?: string; mobile?: string };
 type ImageMap = Record<string, HeroAsset | string>;
@@ -10,12 +11,26 @@ const StorefrontImagesContext = createContext<StorefrontImagesState | null>(null
 
 export function StorefrontImagesProvider({ children }: { children: ReactNode }) {
   const [images, setImages] = useState<ImageMap>({});
+  const pathname = usePathname();
   useEffect(() => {
-    fetch("/api/storefront-images", { cache: "no-store" })
-      .then(async response => response.ok ? response.json() : null)
-      .then(result => { if (result?.configured && result.images) setImages(result.images); })
-      .catch(() => undefined);
-  }, []);
+    let active = true;
+    const refresh = async () => {
+      try {
+        const response = await fetch("/api/storefront-images", { cache: "no-store" });
+        const result = response.ok ? await response.json() : null;
+        if (active) setImages(result?.configured && result.images ? result.images : {});
+      } catch { /* Keep the last successfully loaded image settings during a temporary network error. */ }
+    };
+    const refreshWhenVisible = () => { if (document.visibilityState === "visible") void refresh(); };
+    void refresh();
+    window.addEventListener("focus", refreshWhenVisible);
+    document.addEventListener("visibilitychange", refreshWhenVisible);
+    return () => {
+      active = false;
+      window.removeEventListener("focus", refreshWhenVisible);
+      document.removeEventListener("visibilitychange", refreshWhenVisible);
+    };
+  }, [pathname]);
   const updateImage = async (key: string, viewport: "desktop" | "mobile", image: string) => {
     const response = await fetch("/api/storefront-images", {
       method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key, viewport, image }),

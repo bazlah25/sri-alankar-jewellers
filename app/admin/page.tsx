@@ -111,6 +111,20 @@ export default function AdminPage() {
     [product.name, product.category, product.id].join(" ").toLowerCase().includes(search.toLowerCase().trim())
   ), [products, search]);
 
+  const updateOrderStatus = async (orderId: string, status: string) => {
+    const previous = orders.find(order => order.id === orderId)?.status;
+    setOrders(current => current.map(order => order.id === orderId ? { ...order, status } : order));
+    setOrdersError("");
+    try {
+      const response = await fetch("/api/admin/orders/status", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ orderId, status }) });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message || "Could not update order status.");
+    } catch (reason) {
+      if (previous) setOrders(current => current.map(order => order.id === orderId ? { ...order, status: previous } : order));
+      setOrdersError(reason instanceof Error ? reason.message : "Could not update order status.");
+    }
+  };
+
   const submitProduct = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
@@ -203,7 +217,7 @@ export default function AdminPage() {
         </section>
       </div>
       <section className="sa-admin-panel sa-admin-orders"><div className="sa-admin-inventory-heading"><div><h2>Recent orders</h2><p>Latest orders saved in the store database</p></div><span className="sa-admin-base-tag">{orders.length} ORDERS</span></div>
-        {ordersError ? <p className="sa-admin-storage-note">{ordersError}</p> : orders.length ? <div className="sa-admin-order-list">{orders.map(order => <article key={order.id} className="sa-admin-order-row"><div className="sa-admin-order-main"><strong>#{order.id.slice(0, 8).toUpperCase()} · {order.customer.firstName} {order.customer.lastName}</strong><span>{new Date(order.created_at).toLocaleString("en-IN")} · {order.status} · {order.payment_method.toUpperCase()}</span><span>{order.customer.email} · {order.customer.phone}</span><span>{order.customer.address}{order.customer.addressLine2 ? `, ${order.customer.addressLine2}` : ""}, {order.customer.city}, {order.customer.state} {order.customer.pincode}</span><span>{order.items.map(item => `${item.name}${item.ring_size ? ` (size ${item.ring_size})` : ""} × ${item.quantity}`).join(" · ")}</span></div><strong>{formatPrice(order.total)}</strong></article>)}</div> : <p className="sa-admin-storage-note">No database orders yet. Orders will appear here after checkout is connected.</p>}
+        {ordersError && <p className="sa-admin-error" role="alert">{ordersError}</p>}{orders.length ? <div className="sa-admin-order-list">{orders.map(order => <article key={order.id} className="sa-admin-order-row"><div className="sa-admin-order-main"><strong>#{order.id.slice(0, 8).toUpperCase()} · {order.customer.firstName} {order.customer.lastName}</strong><span>{new Date(order.created_at).toLocaleString("en-IN")} · {order.payment_method.toUpperCase()}</span><label className="sa-admin-order-status">Order status<select value={order.status} onChange={event => void updateOrderStatus(order.id, event.target.value)}><option value="pending">Pending</option><option value="processing">Processing</option><option value="shipped">Shipped</option><option value="delivered">Delivered</option><option value="cancelled">Cancelled</option></select></label><span>{order.customer.email} · {order.customer.phone}</span><span>{order.customer.address}{order.customer.addressLine2 ? `, ${order.customer.addressLine2}` : ""}, {order.customer.city}, {order.customer.state} {order.customer.pincode}</span><span>{order.items.map(item => `${item.name}${item.ring_size ? ` (size ${item.ring_size})` : ""} × ${item.quantity}`).join(" · ")}</span></div><strong>{formatPrice(order.total)}</strong></article>)}</div> : !ordersError && <p className="sa-admin-storage-note">No database orders yet. Orders will appear here after checkout is connected.</p>}
       </section>
         <p className="sa-admin-storage-note">When Supabase is configured, product edits and orders are shared through the store database. Without database settings, catalogue changes remain in this browser only.</p>
     </section>

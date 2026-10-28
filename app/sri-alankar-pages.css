@@ -561,7 +561,40 @@
 .sa-admin-order-row:last-child { border-bottom: 0; }
 .sa-admin-order-main { display: grid; gap: 5px; min-width: 0; }
 .sa-admin-order-main span { color: #747e8e; font-size: 10px; line-height: 1.5; overflow-wrap: anywhere; }
+.sa-admin-order-status { display: flex; align-items: center; gap: 8px; color: #747e8e; font-size: 9px; }
+.sa-admin-order-status select { min-height: 28px; padding: 4px 25px 4px 8px; border: 1px solid #e2dac8; background: #fffdf8; color: #182642; font-size: 9px; }
 .sa-admin-order-row > strong { flex: 0 0 auto; }
+.sa-track-content { width: min(100% - 40px,780px); min-height: 36vh; margin: 0 auto; padding: 12px 0 65px; }
+.sa-track-form { padding: 24px; border: 1px solid #e7dfca; background: #fffdf8; }
+.sa-track-form > label { display: block; margin-bottom: 10px; color: #243250; font-size: 11px; font-weight: 500; }
+.sa-track-form > div { display: flex; align-items: center; gap: 10px; min-height: 50px; padding-left: 13px; border: 1px solid #e2dac8; color: #8a8d91; }
+.sa-track-form input { flex: 1; min-width: 0; height: 48px; border: 0; outline: 0; background: transparent; color: #182642; font: inherit; font-size: 12px; }
+.sa-track-form button { align-self: stretch; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 0; background: #0b1f4a; color: #fffdf8; font-size: 9px; letter-spacing: .8px; cursor: pointer; }
+.sa-track-form button:disabled { opacity: .7; cursor: wait; }
+.sa-track-form > small { display: block; margin-top: 9px; color: #747e8e; font-size: 9px; line-height: 1.5; }
+.sa-track-message { margin: 16px 0; color: #7b4b43; font-size: 11px; line-height: 1.6; }
+.sa-track-results { display: grid; gap: 14px; margin-top: 20px; }
+.sa-track-order { padding: 22px 24px; border: 1px solid #e7dfca; background: #fffdf8; }
+.sa-track-order > header { display: flex; justify-content: space-between; align-items: start; gap: 16px; padding-bottom: 17px; border-bottom: 1px solid #eee8d9; }
+.sa-track-order > header .sa-eyebrow { margin-bottom: 6px; font-size: 8px; }
+.sa-track-order > header h2 { margin: 0 0 5px; color: #17233b; font: 400 22px "Playfair Display",Georgia,serif; }
+.sa-track-order > header p { margin: 0; color: #747e8e; font-size: 10px; }
+.sa-track-order > header > strong { color: #17233b; font-size: 12px; white-space: nowrap; }
+.sa-track-progress { display: grid; grid-template-columns: repeat(4,1fr); gap: 0; margin: 22px 0; padding: 0; list-style: none; }
+.sa-track-progress li { position: relative; display: grid; justify-items: center; gap: 8px; color: #9b9da3; text-align: center; }
+.sa-track-progress li:not(:last-child)::after { position: absolute; top: 13px; left: calc(50% + 15px); width: calc(100% - 30px); height: 1px; background: #e2dac8; content: ""; }
+.sa-track-progress li.complete:not(:last-child)::after { background: #b49537; }
+.sa-track-progress li > span { z-index: 1; width: 27px; height: 27px; display: grid; place-items: center; border: 1px solid #d6d0c4; border-radius: 50%; background: #fffdf8; font-size: 10px; }
+.sa-track-progress li.complete > span { border-color: #b49537; background: #0b1f4a; color: #fffdf8; }
+.sa-track-progress li.complete > small { color: #243250; }
+.sa-track-progress li > small { max-width: 82px; color: #747e8e; font-size: 8px; line-height: 1.4; }
+.sa-track-items { padding: 15px 0 11px; border-top: 1px solid #eee8d9; color: #243250; font-size: 10px; }
+.sa-track-items > strong { font-weight: 500; }
+.sa-track-items p { display: flex; justify-content: space-between; gap: 12px; margin: 9px 0 0; color: #626c7d; }
+.sa-track-items p span { white-space: nowrap; }
+.sa-track-payment { display: flex; align-items: center; gap: 7px; margin: 8px 0 0; color: #747e8e; font-size: 9px; }
+.sa-track-payment svg { color: #9c7a20; }
+.sa-track-cancelled { color: #9c5960; font-size: 11px; }
 .sa-admin-toast { position: fixed; z-index: 50; right: 22px; bottom: 22px; display: flex; align-items: center; gap: 9px; padding: 13px 17px; background: #0b1f4a; color: #fffdf8; box-shadow: 0 10px 30px #0b1f4a26; font-size: 11px; }
 .sa-admin-toast svg { color: #e1c76e; }
 .sa-admin-login-page { min-height: 100svh; display: grid; place-items: center; padding: 25px; background: #f3f0e6; color: #111c32; }
@@ -602,6 +635,20 @@
 .sa-admin-edit-image > span { position: absolute; right: 8px; bottom: 8px; z-index: 1; padding: 7px 9px; background: #0b1f4a; color: #fffdf8; font-size: 8px; letter-spacing: .7px; }
 .sa-admin-edit-image input { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; }
 .sa-admin-edit-modal .sa-admin-form { gap: 13px; }
+@media (max-width: 700px) {
+  .sa-track-content { width: calc(100% - 28px); padding: 5px 0 42px; }
+  .sa-track-form { padding: 17px; }
+  .sa-track-form > div { flex-wrap: wrap; gap: 8px; padding: 0 9px; }
+  .sa-track-form > div > svg { flex: 0 0 auto; }
+  .sa-track-form input { flex: 1 1 calc(100% - 40px); }
+  .sa-track-form button { flex: 1 0 100%; min-height: 43px; margin: 0 -9px -1px; }
+  .sa-track-order { padding: 17px; }
+  .sa-track-order > header h2 { font-size: 19px; }
+  .sa-track-progress li > small { max-width: 68px; font-size: 7px; }
+  .sa-track-progress li:not(:last-child)::after { left: calc(50% + 12px); width: calc(100% - 24px); }
+  .sa-admin-order-status { align-items: flex-start; flex-direction: column; gap: 4px; }
+  .sa-admin-order-status select { max-width: 150px; }
+}
 @media (max-width: 700px) {
   .sa-about-hero { min-height: 470px; height: 72vh; max-height: 610px; }
   .sa-about-hero > img { object-position: 60% center; }

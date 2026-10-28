@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDatabaseCatalog } from "@/lib/product-catalog.server";
 import { isDatabaseConfigured, supabaseRequest } from "@/lib/supabase-rest";
+import { sendOrderConfirmationEmail } from "@/lib/order-email";
 
 export const runtime = "nodejs";
 
@@ -55,9 +56,14 @@ export async function POST(request: Request) {
     const [order] = await supabaseRequest<{ id: string }[]>("orders", {
       method: "POST",
       headers: { Prefer: "return=representation" },
-      body: JSON.stringify({ customer, items, subtotal, shipping, total: subtotal + shipping, payment_method: "cod", status: "pending" }),
+      body: JSON.stringify({ customer, phone_lookup: customer.phone.replace(/\D/g, ""), items, subtotal, shipping, total: subtotal + shipping, payment_method: "cod", status: "pending" }),
     });
-    return NextResponse.json({ orderId: order.id });
+    const emailSent = await sendOrderConfirmationEmail({
+      id: order.id, customer,
+      items: items.map(item => ({ ...item, image: products.find(product => product.id === item.product_id)?.image, ...(item.ring_size ? { ring_size: item.ring_size } : {}) })),
+      subtotal, shipping, total: subtotal + shipping,
+    });
+    return NextResponse.json({ orderId: order.id, emailSent });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Could not place the order.";
     return NextResponse.json({ message: message.includes("unavailable") || message.includes("ring size") ? message : "Could not save your order. Please try again." }, { status: 503 });

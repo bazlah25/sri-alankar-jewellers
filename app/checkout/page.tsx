@@ -16,6 +16,8 @@ export default function CheckoutPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [orderId, setOrderId] = useState("");
+  const [confirmationEmailSent, setConfirmationEmailSent] = useState(false);
+  const [customerEmail, setCustomerEmail] = useState("");
   const lines = cart.map(line => ({ ...line, product: catalogProducts.find(product => product.id === line.productId) })).filter(line => line.product);
   const subtotal = lines.reduce((sum, line) => sum + line.product!.price * line.quantity, 0);
   const shipping = subtotal >= 2999 || subtotal === 0 ? 0 : 99;
@@ -36,7 +38,7 @@ export default function CheckoutPage() {
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.message || "Could not place your order.");
-      setOrderId(result.orderId); setSubmitted(true);
+      setOrderId(result.orderId); setConfirmationEmailSent(Boolean(result.emailSent)); setCustomerEmail(String(form.get("email") || "")); setSubmitted(true);
       lines.forEach(line => removeFromCart(line.productId, line.ringSize));
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error) {
@@ -46,8 +48,8 @@ export default function CheckoutPage() {
 
   return <main className="sa-page sa-checkout-page">
     <SiteHeader />
-    <header className="sa-basket-heading"><span className="sa-eyebrow">A FEW DETAILS</span><h1>Checkout</h1><p>Complete your delivery details and review your order.</p></header>
-    {submitted ? <section className="sa-checkout-success" role="status"><span className="sa-eyebrow">ORDER CONFIRMED</span><h2>Thank you</h2><p>Your Cash on Delivery order has been saved. Order reference: <strong>{orderId}</strong>.</p><Link className="sa-button sa-button-dark" href="/jewellery">CONTINUE SHOPPING</Link></section> : lines.length ? <div className="sa-checkout-layout">
+    <header className="sa-basket-heading"><span className="sa-eyebrow">{submitted ? "ORDER CONFIRMED" : "A FEW DETAILS"}</span><h1>{submitted ? "Thank you" : "Checkout"}</h1><p>{submitted ? "Your order is placed and we’re preparing it with care." : "Complete your delivery details and review your order."}</p></header>
+    {submitted ? <section className="sa-checkout-success" role="status"><p>Your Cash on Delivery order has been saved. Order reference: <strong>{orderId}</strong>.</p><p>{confirmationEmailSent ? `A confirmation email has been sent to ${customerEmail}.` : "Your order is saved. Email confirmation is temporarily unavailable; please keep your order reference."}</p><Link className="sa-button sa-button-dark" href={`/track?order=${encodeURIComponent(orderId)}`}>TRACK YOUR ORDER</Link><Link className="sa-text-link" href="/jewellery">CONTINUE SHOPPING</Link></section> : lines.length ? <div className="sa-checkout-layout">
       <form id="checkout-form" className="sa-checkout-form" onSubmit={handleSubmit}>
         <section className="sa-checkout-section"><div className="sa-checkout-section-heading"><span>01</span><div><h2>Contact information</h2><p>We’ll use these details for order updates.</p></div></div>
           <div className="sa-checkout-fields"><label className="sa-field-wide">Email address<input type="email" name="email" autoComplete="email" placeholder="you@example.com" required /></label><label>First name<input name="firstName" autoComplete="given-name" maxLength={60} required /></label><label>Last name<input name="lastName" autoComplete="family-name" maxLength={60} required /></label><label className="sa-field-wide">Phone number<input type="tel" name="phone" autoComplete="tel" inputMode="tel" pattern="[0-9+() -]{10,18}" placeholder="10-digit mobile number" required /></label></div>
