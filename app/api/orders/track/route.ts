@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 type TrackingOrder = {
   id: string; created_at: string; status: string; payment_method: string;
-  items: { name: string; price: number; quantity: number; ring_size?: string }[]; subtotal: number; shipping: number; total: number;
+  items: { product_id?: string; name: string; price: number; quantity: number; ring_size?: string }[]; subtotal: number; shipping: number; total: number;
 };
 
 export async function POST(request: Request) {
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ lookupType: isOrderId || isShortReference ? "order" : "phone", orders: orders.map(order => ({
       id: order.id, created_at: order.created_at, status: order.status,
       payment_method: order.payment_method, subtotal: order.subtotal, shipping: order.shipping, total: order.total,
-      items: Array.isArray(order.items) ? order.items.map(item => ({ name: item.name, price: item.price, quantity: item.quantity, ...(item.ring_size ? { ring_size: item.ring_size } : {}) })) : [],
+      items: Array.isArray(order.items) ? order.items.map(item => ({ product_id: item.product_id, name: item.name, price: item.price, quantity: item.quantity, ...(item.ring_size ? { ring_size: item.ring_size } : {}) })) : [],
     })) }, { headers: { "Cache-Control": "no-store" } });
   } catch {
     return NextResponse.json({ message: "Could not look up this order. Please try again shortly." }, { status: 503 });

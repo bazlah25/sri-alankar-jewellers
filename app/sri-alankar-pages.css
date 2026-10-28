@@ -371,6 +371,7 @@
 .sa-checkout-success { max-width: 520px; min-height: 310px; margin: 0 auto; padding: 40px 20px 65px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
 .sa-checkout-success h2 { margin: 0; color: #111c32; font: 400 38px "Playfair Display",Georgia,serif; }
 .sa-checkout-success p { max-width: 420px; margin: 12px 0 24px; color: #626c7d; font-size: 12px; line-height: 1.7; }
+.sa-checkout-success .sa-button + .sa-text-link { margin-top: 16px; padding: 5px 0; }
 .sa-about-hero { position: relative; min-height: 470px; height: clamp(470px,54vw,700px); overflow: hidden; background: #e8dfca; }
 .sa-about-hero > img { object-fit: cover; object-position: center 48%; }
 .sa-about-hero-wash { position: absolute; inset: 0; background: linear-gradient(90deg,rgba(244,233,220,.95) 0%,rgba(244,233,220,.82) 34%,rgba(244,233,220,.08) 72%); }
@@ -601,6 +602,14 @@
 .sa-track-items p { display: flex; justify-content: space-between; gap: 12px; margin: 9px 0 0; color: #626c7d; }
 .sa-track-items p span { min-width: 0; white-space: normal; }
 .sa-track-items p strong { color: #182642; font-size: 10px; font-weight: 500; white-space: nowrap; }
+.sa-track-item { display: grid; grid-template-columns: 48px minmax(0,1fr) auto; align-items: center; gap: 11px; margin-top: 10px; padding: 9px; border: 1px solid #eee8d9; background: #fffdf8; }
+.sa-track-item-image { position: relative; width: 48px; height: 54px; overflow: hidden; background: #f2eddf; }
+.sa-track-item-image img { object-fit: cover; }
+.sa-track-item-placeholder { display: grid; place-items: center; color: #747e8e; font-size: 7px; }
+.sa-track-item-copy { display: grid; gap: 4px; min-width: 0; }
+.sa-track-item-copy strong { overflow: hidden; color: #243250; font-size: 10px; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+.sa-track-item-copy span { color: #747e8e; font-size: 9px; }
+.sa-track-item-price { color: #182642; font-size: 10px; font-weight: 500; white-space: nowrap; }
 .sa-track-totals { margin-top: 12px; padding-top: 9px; border-top: 1px solid #eee8d9; color: #626c7d; font-size: 10px; }
 .sa-track-totals p { display: flex; justify-content: space-between; gap: 12px; margin: 6px 0; }
 .sa-track-totals strong { color: #182642; font-weight: 500; }
