@@ -235,12 +235,54 @@ function confirmationHtml(
 </html>`;
 }
 
+function newOrderNotificationHtml(order: ConfirmationOrder, adminUrl: string) {
+  const orderNumber = order.id.slice(0, 8).toUpperCase();
+  const address = [
+    order.customer.address,
+    order.customer.addressLine2,
+    order.customer.city,
+    order.customer.state,
+    order.customer.pincode,
+  ].filter(Boolean).map(escapeHtml).join(", ");
+  const items = order.items.map(item => `<tr>
+    <td style="padding:12px 0;border-bottom:1px solid #eee8dc;color:#182642;font:14px Arial,sans-serif">
+      <strong>${escapeHtml(item.name)}</strong>${item.ring_size ? `<div style="margin-top:4px;color:#747e8e;font-size:12px">Ring size ${escapeHtml(item.ring_size)}</div>` : ""}
+      <div style="margin-top:4px;color:#747e8e;font-size:12px">Qty ${item.quantity}</div>
+    </td>
+    <td align="right" style="padding:12px 0;border-bottom:1px solid #eee8dc;color:#182642;font:14px Arial,sans-serif;white-space:nowrap">${escapeHtml(formatPrice(item.price * item.quantity))}</td>
+  </tr>`).join("");
+
+  return `<!doctype html><html><body style="margin:0;padding:28px 12px;background:#f5f1e8;font-family:Arial,sans-serif;color:#182642">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td align="center">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:620px;background:#fffdf8;border:1px solid #e5dcc9">
+        <tr><td align="center" style="padding:28px;border-bottom:1px solid #eee8dc">
+          <img src="cid:saj-brand-logo" width="170" alt="Sri Alankar Jewellers" style="display:block;width:170px;max-width:100%;height:auto;margin:0 auto 20px">
+          <div style="font:10px Arial,sans-serif;letter-spacing:2px;color:#9b7a2e">NEW ORDER RECEIVED</div>
+          <h1 style="margin:10px 0 5px;font:normal 30px Georgia,serif;color:#13213b">Order #${orderNumber}</h1>
+          <p style="margin:0;color:#687184;font:14px/1.6 Arial,sans-serif">A new order has been placed on your storefront.</p>
+        </td></tr>
+        <tr><td style="padding:24px 28px">
+          <h2 style="margin:0 0 10px;font:normal 20px Georgia,serif;color:#13213b">Items ordered</h2>
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0">${items}</table>
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-top:12px;font:13px Arial,sans-serif;color:#687184">
+            <tr><td style="padding:5px 0">Subtotal</td><td align="right">${escapeHtml(formatPrice(order.subtotal))}</td></tr>
+            <tr><td style="padding:5px 0">Shipping</td><td align="right">${order.shipping ? escapeHtml(formatPrice(order.shipping)) : "Free"}</td></tr>
+            <tr><td style="padding:12px 0;border-top:1px solid #e5dcc9;color:#13213b;font-weight:600">Total · Cash on delivery</td><td align="right" style="padding:12px 0;border-top:1px solid #e5dcc9;color:#13213b;font-weight:600">${escapeHtml(formatPrice(order.total))}</td></tr>
+          </table>
+          <h2 style="margin:22px 0 8px;font:normal 20px Georgia,serif;color:#13213b">Customer and delivery</h2>
+          <p style="margin:0;color:#687184;font:13px/1.7 Arial,sans-serif"><strong style="color:#182642">${escapeHtml(`${order.customer.firstName} ${order.customer.lastName}`)}</strong><br>${escapeHtml(order.customer.email)}<br>${escapeHtml(order.customer.phone)}<br>${address}</p>
+          <p style="margin:24px 0 0;text-align:center"><a href="${escapeHtml(adminUrl)}" style="display:inline-block;padding:13px 21px;background:#0b1f4a;color:#fffdf8;text-decoration:none;font:600 11px Arial,sans-serif;letter-spacing:1px">VIEW ORDER IN ADMIN</a></p>
+        </td></tr>
+      </table>
+    </td></tr></table>
+  </body></html>`;
+}
+
 export async function sendOrderConfirmationEmail(
   order: ConfirmationOrder
 ) {
   const sender = "jewellerssrialankar@gmail.com";
-  const orderNotificationEmail =
-    process.env.ORDER_NOTIFICATION_EMAIL || sender;
+  const orderNotificationEmail = process.env.ORDER_NOTIFICATION_EMAIL || sender;
   const account = process.env.SMTP_USER || sender;
   const password = process.env.SMTP_APP_PASSWORD;
 
@@ -297,7 +339,6 @@ export async function sendOrderConfirmationEmail(
     const result = await transport.sendMail({
       from: `Sri Alankar Jewellers <${sender}>`,
       to: order.customer.email,
-      bcc: orderNotificationEmail,
       replyTo: sender,
       subject: `Your Sri Alankar Jewellers order is confirmed · #${order.id
         .slice(0, 8)
@@ -310,6 +351,26 @@ Track your order: ${trackingLink.toString()}`,
       html,
       attachments,
     });
+
+    try {
+      const adminUrl = new URL("/admin/orders", trackingLink.origin).toString();
+      await transport.sendMail({
+        from: `Sri Alankar Jewellers <${sender}>`,
+        to: orderNotificationEmail,
+        replyTo: order.customer.email,
+        subject: `New order received · #${order.id.slice(0, 8).toUpperCase()}`,
+        text: `A new order was placed.\n\nOrder #${order.id.slice(0, 8).toUpperCase()}\nCustomer: ${order.customer.firstName} ${order.customer.lastName}\nEmail: ${order.customer.email}\nPhone: ${order.customer.phone}\nItems: ${order.items.map(item => `${item.name}${item.ring_size ? ` (size ${item.ring_size})` : ""} × ${item.quantity} — ${formatPrice(item.price * item.quantity)}`).join("; ")}\nTotal: ${formatPrice(order.total)} · Cash on delivery\n\nView order: ${adminUrl}`,
+        html: newOrderNotificationHtml(order, adminUrl),
+        attachments: [{
+          filename: "sri-alankar-logo.png",
+          path: resolve(process.cwd(), "public/sri-alankar-logo.png"),
+          cid: "saj-brand-logo",
+          contentDisposition: "inline",
+        }],
+      });
+    } catch (error) {
+      console.error("New order notification could not be sent.", error instanceof Error ? error.message : "Unknown mail error");
+    }
 
     return (
       result.accepted.includes(order.customer.email) &&
