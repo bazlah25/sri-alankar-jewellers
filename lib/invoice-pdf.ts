@@ -156,6 +156,9 @@ export function createInvoicePdf(order: InvoiceOrder) {
   const line = (x1: number, top1: number, x2: number, top2: number, color = BORDER, width = 1) => {
     page().push(`${color} RG ${width} w ${x1} ${PAGE_H - top1} m ${x2} ${PAGE_H - top2} l S`);
   };
+  const outlineRect = (x: number, top: number, width: number, height: number, color = GOLD) => {
+    page().push(`${color} RG 0.65 w ${x} ${PAGE_H - top - height} ${width} ${height} re S`);
+  };
   const circle = (centerX: number, top: number, radius: number) => {
     const centerY = PAGE_H - top - radius;
     const curve = radius * 0.55228475;
@@ -163,6 +166,30 @@ export function createInvoicePdf(order: InvoiceOrder) {
   };
   const image = (name: string, x: number, top: number, width: number, height: number) => {
     page().push(`q ${width} 0 0 ${height} ${x} ${PAGE_H - top - height} cm /${name} Do Q`);
+  };
+  const contactIcon = (kind: "mail" | "phone" | "address", x: number, top: number) => {
+    if (kind === "mail") {
+      outlineRect(x, top + 2, 10, 7);
+      line(x + 1, top + 3, x + 5, top + 6, GOLD, 0.65);
+      line(x + 5, top + 6, x + 9, top + 3, GOLD, 0.65);
+    } else if (kind === "phone") {
+      line(x + 1, top + 1, x + 2.5, top + 0.5, GOLD, 1.1);
+      line(x + 2.5, top + 0.5, x + 4, top + 2, GOLD, 1.1);
+      line(x + 4, top + 2, x + 3, top + 3.5, GOLD, 1.1);
+      line(x + 3, top + 3.5, x + 6.5, top + 7, GOLD, 1.1);
+      line(x + 6.5, top + 7, x + 8, top + 6, GOLD, 1.1);
+      line(x + 8, top + 6, x + 9.5, top + 7.5, GOLD, 1.1);
+      line(x + 9.5, top + 7.5, x + 9, top + 9, GOLD, 1.1);
+      line(x + 9, top + 9, x + 7, top + 9, GOLD, 1.1);
+      line(x + 7, top + 9, x + 4, top + 7, GOLD, 1.1);
+      line(x + 4, top + 7, x + 1.5, top + 4, GOLD, 1.1);
+      line(x + 1.5, top + 4, x + 1, top + 1, GOLD, 1.1);
+    } else {
+      circle(x + 5, top + 1, 4);
+      line(x + 2.5, top + 8, x + 5, top + 12, GOLD, 0.8);
+      line(x + 5, top + 12, x + 7.5, top + 8, GOLD, 0.8);
+      circle(x + 5, top + 3, 1.1);
+    }
   };
   const drawHeader = (first: boolean) => {
     rect(0, 0, PAGE_W, first ? 146 : 99, PALE);
@@ -270,7 +297,7 @@ export function createInvoicePdf(order: InvoiceOrder) {
   line(35, addressY, 560, addressY, BORDER, 0.7);
   text(48, addressY + 14, 10, "Shipping Address", NAVY, true);
   text(334, addressY + 14, 10, "Need Help?", NAVY, true);
-  line(310, addressY + 9, 310, addressY + 82, GOLD, 0.7);
+  line(310, addressY + 9, 310, addressY + 122, GOLD, 0.7);
   const addressLines = [
     `${order.customer.firstName} ${order.customer.lastName}`,
     ...wrap(order.customer.address, 32),
@@ -280,7 +307,13 @@ export function createInvoicePdf(order: InvoiceOrder) {
   ];
   addressLines.slice(0, 5).forEach((addressLine, index) => text(48, addressY + 31 + index * 11, 7.5, addressLine, MUTED));
   text(334, addressY + 32, 8, "For order support, reply to your confirmation email.", MUTED);
-  text(334, addressY + 48, 8, "jewellerssrialankar@gmail.com", NAVY);
+  contactIcon("mail", 334, addressY + 46);
+  text(349, addressY + 48, 8, "jewellerssrialankar@gmail.com", NAVY);
+  contactIcon("phone", 334, addressY + 59);
+  text(349, addressY + 62, 8, "+91 99550 67766", NAVY);
+  contactIcon("address", 334, addressY + 85);
+  wrap("Sri Alankar Jewellers, Gandhi Bazaar, Near Anjaneya Temple, Opposite Lalitha Bakery, Hassan - 573201", 48)
+    .slice(0, 3).forEach((contactLine, index) => text(349, addressY + 87 + index * 8, 7, contactLine, MUTED));
 
   const footerY = 755;
   rect(0, footerY, PAGE_W, PAGE_H - footerY, PALE);
@@ -293,7 +326,7 @@ export function createInvoicePdf(order: InvoiceOrder) {
     line(center, footerY + 16, center + 4, footerY + 21, GOLD, 0.65);
     line(center + 4, footerY + 21, center, footerY + 26, GOLD, 0.65);
     line(center, footerY + 26, center - 4, footerY + 21, GOLD, 0.65);
-    text(center - label.length * 2.25, footerY + 38, 7, label, NAVY);
+    text(center - label.length * 1.75, footerY + 38, 7, label, NAVY);
   });
   line(56, footerY + 57, 539, footerY + 57, BORDER, 0.55);
   text(183, footerY + 66, 7, "SRI ALANKAR JEWELLERS  ·  EXCLUSIVE JEWELS, EXCLUSIVE YOU", GOLD, true);

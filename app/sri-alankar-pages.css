@@ -758,6 +758,23 @@
   .sa-account-welcome h2 { font-size: 22px; }
   .sa-account-welcome button { flex: 0 0 auto; font-size: 8px; }
 }
+
+.sa-contact-heading { padding: 76px 20px 48px; text-align: center; }
+.sa-contact-heading h1 { margin: 8px 0 12px; color: #111c32; font: 400 clamp(42px,6vw,68px)/1.05 "Playfair Display",Georgia,serif; letter-spacing: -1.5px; }
+.sa-contact-heading > p { margin: 0; color: #626c7d; font-size: 13px; line-height: 1.7; }
+.sa-contact-details { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); max-width: 900px; margin: 0 auto; padding: 12px 25px 70px; gap: 22px; }
+.sa-contact-details article { min-height: 260px; padding: 34px; border: 1px solid #e2dac8; background: #fffdf8; }
+.sa-contact-icon { display: grid; width: 44px; height: 44px; margin-bottom: 20px; place-items: center; color: #0b1f4a; background: #f5f1e6; }
+.sa-contact-details article > .sa-eyebrow { color: #a57a2d; font-size: 9px; letter-spacing: 1.7px; }
+.sa-contact-details h2 { margin: 8px 0 14px; color: #111c32; font: 400 24px/1.2 "Playfair Display",Georgia,serif; }
+.sa-contact-details a,.sa-contact-details address { color: #46536d; font-size: 13px; line-height: 1.9; font-style: normal; }
+.sa-contact-details address strong { color: #243250; font-weight: 600; }
+.sa-contact-details a { text-decoration: underline; text-decoration-color: #c3a566; text-underline-offset: 4px; }
+@media (max-width: 650px) {
+  .sa-contact-heading { padding: 52px 20px 30px; }
+  .sa-contact-details { grid-template-columns: 1fr; padding: 10px 5% 38px; gap: 12px; }
+  .sa-contact-details article { min-height: 0; padding: 25px; }
+}
 @media (max-width: 700px) {
   .sa-track-content { width: calc(100% - 28px); padding: 5px 0 42px; }
   .sa-track-form { padding: 17px; }

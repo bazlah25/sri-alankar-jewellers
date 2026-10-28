@@ -189,7 +189,7 @@ export default function HomePage() {
       <footer className="footer" id="footer">
         <div><a href="/" className="wordmark logo-link footer-logo-link" aria-label="Sri Alankar Jewellers home"><Image src="/sri-alankar-logo.png" alt="Sri Alankar Jewellers" width={260} height={100} className="brand-logo" /></a><p>Exclusive jewels, exclusive you.</p></div>
         <div><strong>EXPLORE</strong><a href="/new-in">New In</a><a href="/jewellery">Jewellery</a><a href="/collections">Collections</a><a href="/gifts">Gifts</a></div>
-        <div><strong>HELP</strong><a href="/track">Track your order</a><span className="footer-static-link">Shipping &amp; Returns</span><span className="footer-static-link">Care Guide</span><span className="footer-static-link">Contact Us</span></div>
+        <div><strong>HELP</strong><a href="/track">Track your order</a><span className="footer-static-link">Shipping &amp; Returns</span><span className="footer-static-link">Care Guide</span><a href="/contact">Contact Us</a></div>
         <div><strong>FOLLOW ALONG</strong><span className="footer-static-link"><Instagram size={16}/> Instagram</span><span className="footer-static-link">Privacy &amp; Terms</span></div>
         <div className="copyright">© 2026 Sri Alankar Jewellers. Demo storefront — replace placeholder content and connect ecommerce services before launch.</div>
       </footer>

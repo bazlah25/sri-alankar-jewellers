@@ -62,7 +62,7 @@ export function SiteFooter() {
   return <footer className="footer" id="footer">
     <div><Link href="/" className="wordmark logo-link footer-logo-link" aria-label="Sri Alankar Jewellers home"><Image src="/sri-alankar-logo.png" alt="Sri Alankar Jewellers" width={260} height={100} className="brand-logo"/></Link><p>Silver Beyond Occasions</p></div>
     <div><strong>EXPLORE</strong><Link href="/new-in">New In</Link><Link href="/jewellery">Jewellery</Link><Link href="/collections">Collections</Link><Link href="/gifts">Gifts</Link><Link href="/about">About</Link><Link href="/wishlist">Wishlist</Link><Link href="/cart">Shopping bag</Link></div>
-    <div><strong>HELP</strong><Link href="/track">Track your order</Link><span className="footer-static-link">Shipping &amp; Returns</span><span className="footer-static-link">Care Guide</span><span className="footer-static-link">Contact Us</span></div>
+    <div><strong>HELP</strong><Link href="/track">Track your order</Link><span className="footer-static-link">Shipping &amp; Returns</span><span className="footer-static-link">Care Guide</span><Link href="/contact">Contact Us</Link></div>
     <div><strong>FOLLOW ALONG</strong><span className="footer-static-link"><Instagram size={16}/> Instagram</span><span className="footer-static-link">Privacy &amp; Terms</span></div>
     <div className="copyright">© 2026 Sri Alankar Jewellers. Demo storefront — checkout and inventory require a connected ecommerce service.</div>
   </footer>;
