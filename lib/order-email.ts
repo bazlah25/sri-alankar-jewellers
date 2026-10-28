@@ -80,6 +80,7 @@ function confirmationHtml(order: ConfirmationOrder, trackingUrl: string, attachm
 
 export async function sendOrderConfirmationEmail(order: ConfirmationOrder) {
   const sender = "jewellerssrialankar@gmail.com";
+  const orderNotificationEmail = process.env.ORDER_NOTIFICATION_EMAIL || sender;
   const account = process.env.SMTP_USER || sender;
   const password = process.env.SMTP_APP_PASSWORD;
   if (!password) return false;
@@ -99,6 +100,7 @@ export async function sendOrderConfirmationEmail(order: ConfirmationOrder) {
     const result = await transport.sendMail({
       from: `Sri Alankar Jewellers <${sender}>`,
       to: order.customer.email,
+      bcc: orderNotificationEmail,
       replyTo: sender,
       subject: `Your Sri Alankar Jewellers order is confirmed · #${order.id.slice(0, 8).toUpperCase()}`,
       text: `Thank you, ${order.customer.firstName}. Your order #${order.id.slice(0, 8).toUpperCase()} is confirmed. Total: ${formatPrice(order.total)}. Payment: Cash on delivery.\n\nTrack your order: ${trackingLink.toString()}`,
