@@ -48,7 +48,7 @@ export function SiteHeader() {
       </nav>
       <div className="header-actions">
         <button className="icon-button" aria-label="Search" onClick={() => setSearchOpen(!searchOpen)}><Search size={20}/></button>
-        <button className="icon-button" aria-label="Account" onClick={() => setNotice("Customer accounts can be connected when you add your ecommerce backend.")}><UserRound size={20}/></button>
+        <Link className="icon-button" aria-label="Customer account" href="/account"><UserRound size={20}/></Link>
         <Link className="icon-button count-link" aria-label={`Wishlist, ${wishlist.length} saved`} href="/wishlist"><Heart size={20}/>{wishlist.length > 0 && <span>{wishlist.length}</span>}</Link>
         <Link className="icon-button bag-button count-link" aria-label={`Shopping bag, ${cartCount} items`} href="/cart"><ShoppingBag size={20}/><span>{cartCount}</span></Link>
       </div>

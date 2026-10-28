@@ -81,7 +81,7 @@ export default function HomePage() {
         </nav>
         <div className="header-actions">
           <button className="icon-button" aria-label="Search" onClick={() => setSearchOpen(!searchOpen)}><Search size={20} /></button>
-          <button className="icon-button" aria-label="Account" onClick={() => setNotice("Customer accounts can be connected when you add your ecommerce backend.")}><UserRound size={20} /></button>
+          <Link className="icon-button" aria-label="Customer account" href="/account"><UserRound size={20} /></Link>
           <Link className="icon-button count-link" aria-label={`Wishlist, ${wishlist.length} saved`} href="/wishlist"><Heart size={20}/>{wishlist.length > 0 && <span>{wishlist.length}</span>}</Link>
           <Link className="icon-button bag-button count-link" aria-label={`Shopping bag, ${cartCount} items`} href="/cart"><ShoppingBag size={20}/><span>{cartCount}</span></Link>
         </div>
@@ -104,7 +104,7 @@ export default function HomePage() {
           <p className="eyebrow">SRI ALANKAR JEWELLERS</p>
           <h1>Exclusive Jewels,<br /><em>Exclusive You.</em></h1>
           <p className="hero-description">Timeless pieces for everyday moments,<br className="desktop-break" /> special milestones, and everything in between.</p>
-          <a className="button button-dark" href="#signature">SHOP THE COLLECTION <ArrowRight size={16}/></a>
+          <div className="home-hero-actions"><a className="button button-dark" href="#signature">SHOP THE COLLECTION <ArrowRight size={16}/></a><Link className="home-track-link" href="/track">TRACK YOUR ORDER <ArrowRight size={15}/></Link></div>
         </div>
         <p className="hero-script">More than<br />Jewellery ♡</p>
       </section>
@@ -188,7 +188,7 @@ export default function HomePage() {
       <footer className="footer" id="footer">
         <div><a href="/" className="wordmark logo-link footer-logo-link" aria-label="Sri Alankar Jewellers home"><Image src="/sri-alankar-logo.png" alt="Sri Alankar Jewellers" width={260} height={100} className="brand-logo" /></a><p>Exclusive jewels, exclusive you.</p></div>
         <div><strong>EXPLORE</strong><a href="/new-in">New In</a><a href="/jewellery">Jewellery</a><a href="/collections">Collections</a><a href="/gifts">Gifts</a></div>
-        <div><strong>HELP</strong><span className="footer-static-link">Shipping &amp; Returns</span><span className="footer-static-link">Care Guide</span><span className="footer-static-link">Contact Us</span></div>
+        <div><strong>HELP</strong><a href="/track">Track your order</a><span className="footer-static-link">Shipping &amp; Returns</span><span className="footer-static-link">Care Guide</span><span className="footer-static-link">Contact Us</span></div>
         <div><strong>FOLLOW ALONG</strong><span className="footer-static-link"><Instagram size={16}/> Instagram</span><span className="footer-static-link">Privacy &amp; Terms</span></div>
         <div className="copyright">© 2026 Sri Alankar Jewellers. Demo storefront — replace placeholder content and connect ecommerce services before launch.</div>
       </footer>
