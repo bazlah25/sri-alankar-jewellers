@@ -9,6 +9,11 @@ import { useShop } from "@/components/ShopProvider";
 import { formatPrice } from "@/data/products";
 import { useProductCatalog } from "@/components/ProductCatalogProvider";
 
+const indianStatesAndTerritories = [
+  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal",
+  "Andaman and Nicobar Islands", "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu", "Delhi", "Jammu and Kashmir", "Ladakh", "Lakshadweep", "Puducherry",
+];
+
 export default function CheckoutPage() {
   const { cart, removeFromCart } = useShop();
   const { products: catalogProducts } = useProductCatalog();
@@ -75,7 +80,7 @@ export default function CheckoutPage() {
           <div className="sa-checkout-fields"><label className="sa-field-wide">Email address<input type="email" name="email" autoComplete="email" placeholder="you@example.com" required /></label><label>First name<input name="firstName" autoComplete="given-name" maxLength={60} required /></label><label>Last name<input name="lastName" autoComplete="family-name" maxLength={60} required /></label><label className="sa-field-wide">Phone number<input type="tel" name="phone" autoComplete="tel" inputMode="tel" pattern="[0-9+() -]{10,18}" placeholder="10-digit mobile number" required /></label></div>
         </section>
         <section className="sa-checkout-section"><div className="sa-checkout-section-heading"><span>02</span><div><h2>Delivery address</h2><p>Where should we send your Sri Alankar Jewellers pieces?</p></div></div>
-          <div className="sa-checkout-fields"><label className="sa-field-wide">Address<input name="address" autoComplete="street-address" maxLength={160} required /></label><label>Apartment, suite, etc. <small>Optional</small><input name="addressLine2" autoComplete="address-line2" maxLength={100} /></label><label>City<input name="city" autoComplete="address-level2" maxLength={80} required /></label><label>State<input name="state" autoComplete="address-level1" maxLength={80} required /></label><label>PIN code<input name="pincode" autoComplete="postal-code" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} placeholder="6 digits" required /></label></div>
+          <div className="sa-checkout-fields"><label className="sa-field-wide">Address<input name="address" autoComplete="street-address" maxLength={160} required /></label><label>Apartment, suite, etc. <small>Optional</small><input name="addressLine2" autoComplete="address-line2" maxLength={100} /></label><label>City<input name="city" autoComplete="address-level2" maxLength={80} required /></label><label>State / Union Territory<select name="state" autoComplete="address-level1" defaultValue="" required><option value="" disabled>Select your state or union territory</option>{indianStatesAndTerritories.map(state => <option key={state} value={state}>{state}</option>)}</select></label><label>PIN code<input name="pincode" autoComplete="postal-code" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} placeholder="6 digits" required /></label></div>
         </section>
         <section className="sa-checkout-section"><div className="sa-checkout-section-heading"><span>03</span><div><h2>Payment method</h2><p>Choose a demo option to complete the preview.</p></div></div>
           <label className="sa-payment-option"><input type="radio" name="payment" value="cod" defaultChecked /><span><strong>Cash on delivery</strong><small>Pay when your order is delivered.</small></span></label>
