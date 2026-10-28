@@ -2,9 +2,12 @@
 import nodemailer, { type SendMailOptions } from "nodemailer";
 import { resolve } from "node:path";
 import { formatPrice } from "@/data/products";
+import { createInvoicePdf } from "@/lib/invoice-pdf";
 
 type ConfirmationOrder = {
   id: string;
+  created_at?: string;
+  status?: string;
   customer: {
     email: string;
     firstName: string;
@@ -224,6 +227,8 @@ function confirmationHtml(
               <br>
               Need help with your order? Reply to this email.
               <br>
+              Your customized invoice is attached as a PDF.
+              <br>
               <span style="color:#182642">
                 Sri Alankar Jewellers · Exclusive Jewels, Exclusive You.
               </span>
@@ -353,6 +358,7 @@ export async function sendOrderConfirmationEmail(
     );
 
     trackingLink.searchParams.set("order", order.id);
+    const invoicePdf = createInvoicePdf({ ...order, created_at: order.created_at || new Date().toISOString() });
 
     const attachments: NonNullable<
       SendMailOptions["attachments"]
@@ -373,6 +379,12 @@ export async function sendOrderConfirmationEmail(
       trackingLink.toString(),
       attachments
     );
+    attachments.push({
+      filename: `Sri-Alankar-Invoice-${order.id.slice(0, 8).toUpperCase()}.pdf`,
+      content: invoicePdf,
+      contentType: "application/pdf",
+      contentDisposition: "attachment",
+    });
 
     const result = await transport.sendMail({
       from: `Sri Alankar Jewellers <${sender}>`,
@@ -383,7 +395,7 @@ export async function sendOrderConfirmationEmail(
         .toUpperCase()}`,
       text: `Thank you, ${order.customer.firstName}. Your order #${order.id
         .slice(0, 8)
-        .toUpperCase()} is confirmed. Total: ${formatPrice(order.total)}. Payment: Cash on delivery.
+        .toUpperCase()} is confirmed. Total: ${formatPrice(order.total)}. Payment: Cash on delivery. Your customized invoice is attached as a PDF.
 
 Track your order: ${trackingLink.toString()}`,
       html,
@@ -403,6 +415,12 @@ Track your order: ${trackingLink.toString()}`,
         adminUrl,
         notificationAttachments
       );
+      notificationAttachments.push({
+        filename: `Sri-Alankar-Invoice-${order.id.slice(0, 8).toUpperCase()}.pdf`,
+        content: invoicePdf,
+        contentType: "application/pdf",
+        contentDisposition: "attachment",
+      });
 
       await transport.sendMail({
         from: `Sri Alankar Jewellers <${sender}>`,

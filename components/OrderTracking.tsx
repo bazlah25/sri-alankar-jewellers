@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import Image from "next/image";
-import { ArrowRight, Check, PackageCheck, Search } from "lucide-react";
+import { ArrowRight, Check, FileDown, PackageCheck, Search } from "lucide-react";
 import { formatPrice } from "@/data/products";
 import { useProductCatalog } from "@/components/ProductCatalogProvider";
 
@@ -21,6 +21,8 @@ export default function OrderTracking({ initialOrderId = "" }: { initialOrderId?
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [searched, setSearched] = useState(false);
+  const [invoiceDownloading, setInvoiceDownloading] = useState("");
+  const [invoiceError, setInvoiceError] = useState("");
 
   const lookup = async (value: string) => {
     setLoading(true); setError(""); setOrders([]); setSearched(true);
@@ -38,6 +40,25 @@ export default function OrderTracking({ initialOrderId = "" }: { initialOrderId?
 
   const submit = (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); if (query.trim()) void lookup(query.trim()); };
 
+  const downloadInvoice = async (orderId: string) => {
+    setInvoiceDownloading(orderId); setInvoiceError("");
+    try {
+      const response = await fetch("/api/orders/track", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ query: query.trim(), invoiceId: orderId }) });
+      if (!response.ok) {
+        const result = await response.json();
+        throw new Error(result.message || "Could not download the invoice.");
+      }
+      const blob = await response.blob();
+      const href = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = href;
+      anchor.download = `Sri-Alankar-Invoice-${orderId.slice(0, 8).toUpperCase()}.pdf`;
+      document.body.appendChild(anchor); anchor.click(); anchor.remove();
+      window.setTimeout(() => URL.revokeObjectURL(href), 1000);
+    } catch (reason) { setInvoiceError(reason instanceof Error ? reason.message : "Could not download the invoice."); }
+    finally { setInvoiceDownloading(""); }
+  };
+
   return <section className="sa-track-content">
     <form className="sa-track-form" onSubmit={submit}>
       <label htmlFor="track-query">Order ID or mobile number</label>
@@ -45,6 +66,7 @@ export default function OrderTracking({ initialOrderId = "" }: { initialOrderId?
       <small>Use the order reference shown in your email (for example, #F140F0A9), the full order ID, or the mobile number entered at checkout.</small>
     </form>
     {error && <p className="sa-track-message" role="alert">{error}</p>}
+    {invoiceError && <p className="sa-track-message" role="alert">{invoiceError}</p>}
     {searched && !loading && !error && !orders.length && <p className="sa-track-message">No matching order was found. Check the details and try again.</p>}
     {orders.length > 0 && <div className="sa-track-results" aria-live="polite">{orders.map(order => {
       const cancelled = order.status === "cancelled";
@@ -55,6 +77,7 @@ export default function OrderTracking({ initialOrderId = "" }: { initialOrderId?
         {order.items?.length ? <div className="sa-track-items"><strong>Items</strong>{order.items.map((item, index) => { const image = products.find(product => product.id === item.product_id || product.name === item.name)?.image; return <div className="sa-track-item" key={`${item.name}-${index}`}>{image ? <div className="sa-track-item-image"><Image src={image} alt={item.name} fill sizes="56px" unoptimized/></div> : <div className="sa-track-item-image sa-track-item-placeholder">No image</div>}<div className="sa-track-item-copy"><strong>{item.name}</strong><span>{item.ring_size ? `Size ${item.ring_size} · ` : ""}Qty {item.quantity}</span></div><strong className="sa-track-item-price">{formatPrice(item.price * item.quantity)}</strong></div>; })}</div> : null}
         {order.subtotal !== undefined && <div className="sa-track-totals"><p><span>Subtotal</span><strong>{formatPrice(order.subtotal)}</strong></p>{Boolean(order.discount) && <p><span>Discount{order.coupon_code ? ` · ${order.coupon_code}` : ""}</span><strong>−{formatPrice(order.discount || 0)}</strong></p>}<p><span>Shipping</span><strong>{order.shipping ? formatPrice(order.shipping) : "Free"}</strong></p><p className="total"><span>Order total</span><strong>{formatPrice(order.total || 0)}</strong></p></div>}
         {order.payment_method && <p className="sa-track-payment"><PackageCheck size={15}/> {order.payment_method === "cod" ? "Cash on delivery" : order.payment_method}</p>}
+        <button className="sa-track-invoice-button" type="button" onClick={() => void downloadInvoice(order.id)} disabled={invoiceDownloading === order.id}><FileDown size={15}/>{invoiceDownloading === order.id ? "PREPARING INVOICE…" : "DOWNLOAD INVOICE PDF"}</button>
       </article>;
     })}</div>}
   </section>;

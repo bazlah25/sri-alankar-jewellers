@@ -85,13 +85,13 @@ export async function POST(request: Request) {
     }
     const shipping = subtotal >= 2999 ? 0 : 99;
     const total = Math.max(0, subtotal - discount) + shipping;
-    const [order] = await supabaseRequest<{ id: string }[]>("orders", {
+    const [order] = await supabaseRequest<{ id: string; created_at: string; status: string }[]>("orders", {
       method: "POST",
       headers: { Prefer: "return=representation" },
       body: JSON.stringify({ customer, phone_lookup: customer.phone.replace(/\D/g, ""), items, subtotal, shipping, coupon_code: couponCode, discount, total, payment_method: "cod", status: "pending" }),
     });
     const emailSent = await sendOrderConfirmationEmail({
-      id: order.id, customer,
+      id: order.id, created_at: order.created_at, status: order.status, customer,
       items: items.map(item => ({ ...item, image: products.find(product => product.id === item.product_id)?.image, ...(item.ring_size ? { ring_size: item.ring_size } : {}) })),
       subtotal, shipping, discount, couponCode: couponCode || undefined, total,
     });
