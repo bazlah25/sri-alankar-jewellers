@@ -2,17 +2,35 @@ import { NextResponse } from "next/server";
 import { getDatabaseCatalog } from "@/lib/product-catalog.server";
 import { isDatabaseConfigured, supabaseRequest } from "@/lib/supabase-rest";
 import { sendOrderConfirmationEmail } from "@/lib/order-email";
+import { couponDiscount, type Coupon } from "@/lib/coupons";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 type OrderInput = {
   email?: unknown; phone?: unknown; firstName?: unknown; lastName?: unknown;
   address?: unknown; addressLine2?: unknown; city?: unknown; state?: unknown; pincode?: unknown;
-  paymentMethod?: unknown; items?: unknown;
+  paymentMethod?: unknown; items?: unknown; couponCode?: unknown;
 };
 
 function text(value: unknown, max: number) {
   return typeof value === "string" ? value.trim().slice(0, max) : "";
+}
+
+export async function GET(request: Request) {
+  if (!isDatabaseConfigured()) return NextResponse.json({ message: "Coupons are temporarily unavailable." }, { status: 503 });
+  const url = new URL(request.url);
+  const code = text(url.searchParams.get("coupon"), 32).toUpperCase();
+  const subtotal = Number(url.searchParams.get("subtotal"));
+  if (!/^[A-Z0-9_-]{3,32}$/.test(code) || !Number.isSafeInteger(subtotal) || subtotal < 1) return NextResponse.json({ message: "Enter a valid coupon code." }, { status: 400 });
+  try {
+    const rows = await supabaseRequest<Coupon[]>(`coupons?select=id,code,discount_type,discount_value,valid_from,valid_to,active&code=eq.${encodeURIComponent(code)}&limit=1`);
+    const coupon = rows[0];
+    if (!coupon) return NextResponse.json({ message: "That coupon code isn’t valid." }, { status: 404 });
+    const discount = couponDiscount(coupon, subtotal);
+    if (discount === null) return NextResponse.json({ message: "That coupon is inactive or outside its validity dates." }, { status: 400 });
+    return NextResponse.json({ code: coupon.code, discount }, { headers: { "Cache-Control": "no-store" } });
+  } catch { return NextResponse.json({ message: "Could not check this coupon. Please try again." }, { status: 503 }); }
 }
 
 export async function POST(request: Request) {
@@ -52,16 +70,30 @@ export async function POST(request: Request) {
       return { product_id: product.id, name: product.name, price: product.price, quantity, ...(ringSize ? { ring_size: ringSize } : {}) };
     });
     const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    let couponCode: string | null = null;
+    let discount = 0;
+    if (body.couponCode !== undefined && body.couponCode !== null && body.couponCode !== "") {
+      couponCode = text(body.couponCode, 32).toUpperCase();
+      if (!/^[A-Z0-9_-]{3,32}$/.test(couponCode)) return NextResponse.json({ message: "Enter a valid coupon code." }, { status: 400 });
+      const coupons = await supabaseRequest<Coupon[]>(`coupons?select=id,code,discount_type,discount_value,valid_from,valid_to,active&code=eq.${encodeURIComponent(couponCode)}&limit=1`);
+      const coupon = coupons[0];
+      if (!coupon) return NextResponse.json({ message: "That coupon code isn’t valid." }, { status: 400 });
+      const calculatedDiscount = couponDiscount(coupon, subtotal);
+      if (calculatedDiscount === null) return NextResponse.json({ message: "That coupon is inactive or outside its validity dates." }, { status: 400 });
+      discount = calculatedDiscount;
+      couponCode = coupon.code;
+    }
     const shipping = subtotal >= 2999 ? 0 : 99;
+    const total = Math.max(0, subtotal - discount) + shipping;
     const [order] = await supabaseRequest<{ id: string }[]>("orders", {
       method: "POST",
       headers: { Prefer: "return=representation" },
-      body: JSON.stringify({ customer, phone_lookup: customer.phone.replace(/\D/g, ""), items, subtotal, shipping, total: subtotal + shipping, payment_method: "cod", status: "pending" }),
+      body: JSON.stringify({ customer, phone_lookup: customer.phone.replace(/\D/g, ""), items, subtotal, shipping, coupon_code: couponCode, discount, total, payment_method: "cod", status: "pending" }),
     });
     const emailSent = await sendOrderConfirmationEmail({
       id: order.id, customer,
       items: items.map(item => ({ ...item, image: products.find(product => product.id === item.product_id)?.image, ...(item.ring_size ? { ring_size: item.ring_size } : {}) })),
-      subtotal, shipping, total: subtotal + shipping,
+      subtotal, shipping, discount, couponCode: couponCode || undefined, total,
     });
     return NextResponse.json({ orderId: order.id, emailSent });
   } catch (error) {

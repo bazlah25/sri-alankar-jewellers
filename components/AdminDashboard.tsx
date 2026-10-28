@@ -8,9 +8,10 @@ import { ArrowUpRight, Check, LogOut, PackagePlus, Pencil, Plus, Search, Trash2,
 import { useProductCatalog } from "@/components/ProductCatalogProvider";
 import { formatPrice, type Product } from "@/data/products";
 import StorefrontImageSettings from "@/components/StorefrontImageSettings";
+import type { Coupon } from "@/lib/coupons";
 
 const categories: Product["category"][] = ["Necklaces", "Earrings", "Rings", "Bracelets", "Photo Frames", "Pooja Essentials"];
-type StoreOrder = { id: string; created_at: string; status: string; payment_method: string; customer: { firstName: string; lastName: string; email: string; phone: string; address: string; addressLine2?: string; city: string; state: string; pincode: string }; items: { product_id?: string; name: string; price: number; quantity: number; ring_size?: string; image?: string }[]; total: number };
+type StoreOrder = { id: string; created_at: string; status: string; payment_method: string; customer: { firstName: string; lastName: string; email: string; phone: string; address: string; addressLine2?: string; city: string; state: string; pincode: string }; items: { product_id?: string; name: string; price: number; quantity: number; ring_size?: string; image?: string }[]; coupon_code?: string; discount?: number; total: number };
 
 function slugify(value: string) {
   return value.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -95,6 +96,13 @@ export default function AdminDashboard() {
   const [error, setError] = useState("");
   const [orders, setOrders] = useState<StoreOrder[]>([]);
   const [ordersError, setOrdersError] = useState("");
+  const [coupons, setCoupons] = useState<Coupon[]>([]);
+  const [couponError, setCouponError] = useState("");
+  const [couponCodeInput, setCouponCodeInput] = useState("");
+  const [couponTypeInput, setCouponTypeInput] = useState<Coupon["discount_type"]>("percentage");
+  const [couponValueInput, setCouponValueInput] = useState("10");
+  const [couponFromInput, setCouponFromInput] = useState("");
+  const [couponToInput, setCouponToInput] = useState("");
 
   useEffect(() => {
     let active = true;
@@ -114,6 +122,49 @@ export default function AdminDashboard() {
       })
       .catch(reason => setOrdersError(reason instanceof Error ? reason.message : "Could not load orders."));
   }, [authState, adminSection]);
+
+  useEffect(() => {
+    if (authState !== "signed-in" || adminSection !== "products") return;
+    fetch("/api/admin/coupons", { cache: "no-store" }).then(async response => {
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message || "Could not load coupons.");
+      setCoupons(Array.isArray(result.coupons) ? result.coupons : []);
+      setCouponError("");
+    }).catch(reason => setCouponError(reason instanceof Error ? reason.message : "Could not load coupons."));
+  }, [authState, adminSection]);
+
+  const submitCoupon = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault(); setCouponError("");
+    try {
+      const response = await fetch("/api/admin/coupons", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: couponCodeInput, discount_type: couponTypeInput, discount_value: Number(couponValueInput), valid_from: new Date(couponFromInput).toISOString(), valid_to: new Date(couponToInput).toISOString(), active: true }) });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message || "Could not save coupon.");
+      setCouponCodeInput(""); setCouponValueInput("10");
+      const refreshed = await fetch("/api/admin/coupons", { cache: "no-store" }).then(response => response.json());
+      setCoupons(refreshed.coupons || []);
+      setNotice("Coupon created."); window.setTimeout(() => setNotice(""), 3500);
+    } catch (reason) { setCouponError(reason instanceof Error ? reason.message : "Could not save coupon."); }
+  };
+
+  const toggleCoupon = async (coupon: Coupon) => {
+    setCouponError("");
+    try {
+      const response = await fetch("/api/admin/coupons", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...coupon, active: !coupon.active }) });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message || "Could not update coupon.");
+      setCoupons(current => current.map(item => item.id === coupon.id ? { ...item, active: !item.active } : item));
+    } catch (reason) { setCouponError(reason instanceof Error ? reason.message : "Could not update coupon."); }
+  };
+
+  const deleteCoupon = async (coupon: Coupon) => {
+    setCouponError("");
+    try {
+      const response = await fetch(`/api/admin/coupons?id=${encodeURIComponent(coupon.id)}`, { method: "DELETE" });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message || "Could not delete coupon.");
+      setCoupons(current => current.filter(item => item.id !== coupon.id));
+    } catch (reason) { setCouponError(reason instanceof Error ? reason.message : "Could not delete coupon."); }
+  };
 
   const visibleProducts = useMemo(() => products.filter(product =>
     [product.name, product.category, product.id].join(" ").toLowerCase().includes(search.toLowerCase().trim())
@@ -205,12 +256,13 @@ export default function AdminDashboard() {
   </main>;
 
   return <main className="sa-page sa-admin-page">
-    <header className="sa-admin-topbar"><Link href="/" aria-label="Sri Alankar Jewellers storefront"><Image src="/sri-alankar-logo.png" alt="Sri Alankar Jewellers" width={220} height={74} priority/></Link><span>ADMIN</span><nav className="sa-admin-nav" aria-label="Admin pages"><Link className={adminSection === "products" ? "active" : ""} href="/admin">Products</Link><Link className={adminSection === "images" ? "active" : ""} href="/admin/images">Storefront images</Link><Link className={adminSection === "orders" ? "active" : ""} href="/admin/orders">Orders</Link></nav><div><Link href="/">VIEW STOREFRONT <ArrowUpRight size={14}/></Link><button onClick={handleLogout}><LogOut size={14}/> SIGN OUT</button></div></header>
+    <header className="sa-admin-topbar"><Link href="/" aria-label="Sri Alankar Jewellers storefront"><Image src="/sri-alankar-logo.png" alt="Sri Alankar Jewellers" width={220} height={74} priority/></Link><span>ADMIN</span><nav className="sa-admin-nav" aria-label="Admin pages"><Link className={adminSection === "products" ? "active" : ""} href="/admin">Products</Link><Link className={adminSection === "images" ? "active" : ""} href="/admin/images">Storefront images</Link><Link className={adminSection === "orders" ? "active" : ""} href="/admin/orders">Orders</Link><Link href="/admin#coupons">Coupons</Link></nav><div><Link href="/">VIEW STOREFRONT <ArrowUpRight size={14}/></Link><button onClick={handleLogout}><LogOut size={14}/> SIGN OUT</button></div></header>
     <section className="sa-admin-shell">
       <header className="sa-admin-heading"><div><span className="sa-eyebrow">SRI ALANKAR JEWELLERS · STORE MANAGEMENT</span><h1>{sectionCopy.title}</h1><p>{sectionCopy.description}</p></div><span className="sa-admin-store-link">{databaseConfigured ? "CONNECTED DATABASE" : "LOCAL CATALOGUE"}</span></header>
       {loaded && !databaseConfigured && <p className="sa-admin-error" role="alert">Database isn’t configured on localhost. Add SUPABASE_URL and SUPABASE_SECRET_KEY to .env.local, then restart the dev server. Vercel settings apply to the deployed site only.</p>}
       {adminSection === "products" && <div className="sa-admin-stats"><article><span>Catalogue items</span><strong>{products.length}</strong></article><article><span>Custom uploads</span><strong>{customProducts.length}</strong></article><article><span>Available now</span><strong>{products.filter(product => product.available).length}</strong></article></div>}
       {adminSection === "images" && <StorefrontImageSettings />}
+      {adminSection === "products" && <div className="sa-admin-coupons-layout" id="coupons"><section className="sa-admin-panel sa-admin-coupon-form"><div className="sa-admin-panel-heading"><span className="sa-admin-step-icon"><Check size={17}/></span><div><h2>Create a coupon</h2><p>Customers can apply this code in checkout during its active dates.</p></div></div><form className="sa-admin-form" onSubmit={submitCoupon}><div className="sa-admin-fields"><label className="sa-admin-wide">Coupon code<input required minLength={3} maxLength={32} pattern="[A-Za-z0-9_-]+" value={couponCodeInput} onChange={event => setCouponCodeInput(event.target.value.toUpperCase())} placeholder="e.g. FESTIVE10"/></label><label>Discount type<select value={couponTypeInput} onChange={event => setCouponTypeInput(event.target.value as Coupon["discount_type"])}><option value="percentage">Percentage (%)</option><option value="fixed">Fixed amount (₹)</option></select></label><label>Discount value<input type="number" min="1" max={couponTypeInput === "percentage" ? "100" : undefined} step="1" required value={couponValueInput} onChange={event => setCouponValueInput(event.target.value)}/></label><label>Valid from<input type="datetime-local" required value={couponFromInput} onChange={event => setCouponFromInput(event.target.value)}/></label><label>Valid until<input type="datetime-local" required value={couponToInput} onChange={event => setCouponToInput(event.target.value)}/></label></div>{couponError && <p className="sa-admin-error" role="alert">{couponError}</p>}<button className="sa-admin-submit" type="submit">CREATE COUPON</button></form></section><section className="sa-admin-panel sa-admin-coupon-list"><div className="sa-admin-inventory-heading"><div><h2>Your coupons</h2><p>{coupons.length} coupon codes</p></div></div>{couponError && !coupons.length && <p className="sa-admin-error" role="alert">{couponError}</p>}{coupons.map(coupon => <article className="sa-admin-coupon-row" key={coupon.id}><div><strong>{coupon.code}</strong><span>{coupon.discount_type === "percentage" ? `${coupon.discount_value}% off` : `${formatPrice(coupon.discount_value)} off`}</span><small>{new Date(coupon.valid_from).toLocaleString("en-IN")} – {new Date(coupon.valid_to).toLocaleString("en-IN")}</small></div><button type="button" className={coupon.active ? "active" : ""} onClick={() => void toggleCoupon(coupon)}>{coupon.active ? "ACTIVE" : "PAUSED"}</button><button type="button" className="sa-admin-delete" aria-label={`Delete ${coupon.code}`} onClick={() => void deleteCoupon(coupon)}><Trash2 size={15}/></button></article>)}{!coupons.length && !couponError && <p className="sa-admin-storage-note">No coupons have been created yet.</p>}</section></div>}
       {adminSection === "products" && <div className="sa-admin-grid">
         <section className="sa-admin-panel sa-admin-form-panel"><div className="sa-admin-panel-heading"><span className="sa-admin-step-icon"><PackagePlus size={17}/></span><div><h2>Add a product</h2><p>Product details and images appear in the storefront catalogue.</p></div></div>
           <form className="sa-admin-form" onSubmit={submitProduct}>

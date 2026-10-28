@@ -25,6 +25,8 @@ type ConfirmationOrder = {
   }[];
   subtotal: number;
   shipping: number;
+  discount?: number;
+  couponCode?: string;
   total: number;
 };
 
@@ -183,6 +185,7 @@ function confirmationHtml(
                     ${order.shipping ? escapeHtml(formatPrice(order.shipping)) : "Free"}
                   </td>
                 </tr>
+                ${order.discount ? `<tr><td style="padding:6px 0">Discount${order.couponCode ? ` · ${escapeHtml(order.couponCode)}` : ""}</td><td align="right" style="padding:6px 0;color:#42735d">−${escapeHtml(formatPrice(order.discount))}</td></tr>` : ""}
                 <tr>
                   <td style="padding:13px 0;border-top:1px solid #e5dcc9;color:#13213b;font-weight:600">
                     Total · Cash on delivery
@@ -301,6 +304,7 @@ function newOrderNotificationHtml(
           <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-top:12px;font:13px Arial,sans-serif;color:#687184">
             <tr><td style="padding:5px 0">Subtotal</td><td align="right">${escapeHtml(formatPrice(order.subtotal))}</td></tr>
             <tr><td style="padding:5px 0">Shipping</td><td align="right">${order.shipping ? escapeHtml(formatPrice(order.shipping)) : "Free"}</td></tr>
+            ${order.discount ? `<tr><td style="padding:5px 0">Discount${order.couponCode ? ` · ${escapeHtml(order.couponCode)}` : ""}</td><td align="right" style="color:#42735d">−${escapeHtml(formatPrice(order.discount))}</td></tr>` : ""}
             <tr><td style="padding:12px 0;border-top:1px solid #e5dcc9;color:#13213b;font-weight:600">Total · Cash on delivery</td><td align="right" style="padding:12px 0;border-top:1px solid #e5dcc9;color:#13213b;font-weight:600">${escapeHtml(formatPrice(order.total))}</td></tr>
           </table>
           <h2 style="margin:22px 0 8px;font:normal 20px Georgia,serif;color:#13213b">Customer and delivery</h2>
@@ -405,7 +409,7 @@ Track your order: ${trackingLink.toString()}`,
         to: orderNotificationEmail,
         replyTo: order.customer.email,
         subject: `New order received · #${order.id.slice(0, 8).toUpperCase()}`,
-        text: `A new order was placed.\n\nOrder #${order.id.slice(0, 8).toUpperCase()}\nCustomer: ${order.customer.firstName} ${order.customer.lastName}\nEmail: ${order.customer.email}\nPhone: ${order.customer.phone}\nItems: ${order.items.map(item => `${item.name}${item.ring_size ? ` (size ${item.ring_size})` : ""} × ${item.quantity} — ${formatPrice(item.price * item.quantity)}`).join("; ")}\nTotal: ${formatPrice(order.total)} · Cash on delivery\n\nView order: ${adminUrl}`,
+        text: `A new order was placed.\n\nOrder #${order.id.slice(0, 8).toUpperCase()}\nCustomer: ${order.customer.firstName} ${order.customer.lastName}\nEmail: ${order.customer.email}\nPhone: ${order.customer.phone}\nItems: ${order.items.map(item => `${item.name}${item.ring_size ? ` (size ${item.ring_size})` : ""} × ${item.quantity} — ${formatPrice(item.price * item.quantity)}`).join("; ")}\n${order.discount ? `Coupon: ${order.couponCode || ""} · Discount ${formatPrice(order.discount)}\n` : ""}Total: ${formatPrice(order.total)} · Cash on delivery\n\nView order: ${adminUrl}`,
         html: notificationHtml,
         attachments: notificationAttachments,
       });

@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 type TrackingOrder = {
   id: string; created_at: string; status: string; payment_method: string;
-  items: { product_id?: string; name: string; price: number; quantity: number; ring_size?: string }[]; subtotal: number; shipping: number; total: number;
+  items: { product_id?: string; name: string; price: number; quantity: number; ring_size?: string }[]; subtotal: number; shipping: number; coupon_code?: string; discount?: number; total: number;
 };
 
 export async function POST(request: Request) {
@@ -26,11 +26,11 @@ export async function POST(request: Request) {
     const upperBound = `${prefix}-ffff-ffff-ffff-ffffffffffff`;
     const filter = isOrderId ? `id=eq.${encodeURIComponent(query)}` : isShortReference ? `id=gte.${lowerBound}&id=lte.${upperBound}` : phone.length === 10 ? `phone_lookup=like.*${phone}` : `phone_lookup=eq.${phone}`;
     const limit = isOrderId || isShortReference ? 1 : 10;
-    const orders = await supabaseRequest<TrackingOrder[]>(`orders?select=id,created_at,status,payment_method,items,subtotal,shipping,total&${filter}&order=created_at.desc&limit=${limit}`);
+    const orders = await supabaseRequest<TrackingOrder[]>(`orders?select=id,created_at,status,payment_method,items,subtotal,shipping,coupon_code,discount,total&${filter}&order=created_at.desc&limit=${limit}`);
     if (!orders.length) return NextResponse.json({ orders: [], message: "No matching order was found. Check the details and try again." }, { headers: { "Cache-Control": "no-store" } });
     return NextResponse.json({ lookupType: isOrderId || isShortReference ? "order" : "phone", orders: orders.map(order => ({
       id: order.id, created_at: order.created_at, status: order.status,
-      payment_method: order.payment_method, subtotal: order.subtotal, shipping: order.shipping, total: order.total,
+      payment_method: order.payment_method, subtotal: order.subtotal, shipping: order.shipping, coupon_code: order.coupon_code, discount: order.discount, total: order.total,
       items: Array.isArray(order.items) ? order.items.map(item => ({ product_id: item.product_id, name: item.name, price: item.price, quantity: item.quantity, ...(item.ring_size ? { ring_size: item.ring_size } : {}) })) : [],
     })) }, { headers: { "Cache-Control": "no-store" } });
   } catch {

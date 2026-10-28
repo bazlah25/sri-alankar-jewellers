@@ -18,10 +18,30 @@ export default function CheckoutPage() {
   const [orderId, setOrderId] = useState("");
   const [confirmationEmailSent, setConfirmationEmailSent] = useState(false);
   const [customerEmail, setCustomerEmail] = useState("");
+  const [couponInput, setCouponInput] = useState("");
+  const [couponCode, setCouponCode] = useState("");
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [couponMessage, setCouponMessage] = useState("");
+  const [checkingCoupon, setCheckingCoupon] = useState(false);
   const lines = cart.map(line => ({ ...line, product: catalogProducts.find(product => product.id === line.productId) })).filter(line => line.product);
   const subtotal = lines.reduce((sum, line) => sum + line.product!.price * line.quantity, 0);
   const shipping = subtotal >= 2999 || subtotal === 0 ? 0 : 99;
-  const total = subtotal + shipping;
+  const total = subtotal - couponDiscount + shipping;
+
+  const applyCoupon = async () => {
+    setCheckingCoupon(true); setCouponMessage("");
+    try {
+      const query = new URLSearchParams({ coupon: couponInput.trim(), subtotal: String(subtotal) });
+      const response = await fetch(`/api/orders?${query}`, { cache: "no-store" });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message || "Could not apply coupon.");
+      setCouponCode(result.code); setCouponDiscount(Number(result.discount) || 0); setCouponInput(result.code);
+      setCouponMessage("Coupon applied successfully.");
+    } catch (error) {
+      setCouponCode(""); setCouponDiscount(0);
+      setCouponMessage(error instanceof Error ? error.message : "Could not apply coupon.");
+    } finally { setCheckingCoupon(false); }
+  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -33,7 +53,7 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           email: form.get("email"), phone: form.get("phone"), firstName: form.get("firstName"), lastName: form.get("lastName"),
           address: form.get("address"), addressLine2: form.get("addressLine2"), city: form.get("city"), state: form.get("state"), pincode: form.get("pincode"),
-          paymentMethod: form.get("payment"), items: lines.map(({ product, quantity, ringSize }) => ({ productId: product!.id, quantity, ...(ringSize ? { ringSize } : {}) })),
+          paymentMethod: form.get("payment"), couponCode: couponCode || undefined, items: lines.map(({ product, quantity, ringSize }) => ({ productId: product!.id, quantity, ...(ringSize ? { ringSize } : {}) })),
         }),
       });
       const result = await response.json();
@@ -66,7 +86,8 @@ export default function CheckoutPage() {
         <p className="sa-checkout-privacy-note">Your order and delivery details will be securely stored to fulfil your purchase.</p>
       </form>
       <aside className="sa-checkout-summary"><h2>Your order</h2>{lines.map(({ product, quantity, ringSize }) => product && <article className="sa-checkout-line" key={`${product.id}-${ringSize || "standard"}`}><Link className="sa-checkout-product-image" href={`/products/${product.id}`}><Image src={product.image} alt={product.name} fill sizes="76px" unoptimized/><span>{quantity}</span></Link><div><h3>{product.name}</h3><p>{product.material}{ringSize ? ` · Ring size ${ringSize}` : ""}</p></div><strong>{formatPrice(product.price * quantity)}</strong></article>)}
-        <div className="sa-checkout-totals"><p><span>Subtotal</span><strong>{formatPrice(subtotal)}</strong></p><p><span>Shipping</span><strong>{shipping === 0 ? "Free" : formatPrice(shipping)}</strong></p><p className="sa-checkout-grand-total"><span>Total</span><strong>{formatPrice(total)}</strong></p></div>
+        <div className="sa-coupon-box"><label htmlFor="checkout-coupon">Discount code</label><div><input id="checkout-coupon" value={couponInput} onChange={event => setCouponInput(event.target.value.toUpperCase())} placeholder="Enter coupon code" maxLength={32} disabled={Boolean(couponCode)}/>{couponCode ? <button type="button" onClick={() => { setCouponCode(""); setCouponDiscount(0); setCouponInput(""); setCouponMessage("Coupon removed."); }}>REMOVE</button> : <button type="button" onClick={() => void applyCoupon()} disabled={checkingCoupon || !couponInput.trim()}>{checkingCoupon ? "CHECKING…" : "APPLY"}</button>}</div>{couponMessage && <p role="status" className={couponCode ? "success" : ""}>{couponMessage}</p>}</div>
+        <div className="sa-checkout-totals"><p><span>Subtotal</span><strong>{formatPrice(subtotal)}</strong></p>{couponDiscount > 0 && <p><span>Discount{couponCode ? ` · ${couponCode}` : ""}</span><strong>−{formatPrice(couponDiscount)}</strong></p>}<p><span>Shipping</span><strong>{shipping === 0 ? "Free" : formatPrice(shipping)}</strong></p><p className="sa-checkout-grand-total"><span>Total</span><strong>{formatPrice(total)}</strong></p></div>
         <p className="sa-checkout-shipping-note">{subtotal >= 2999 ? "Your order qualifies for free shipping." : `Add ${formatPrice(2999 - subtotal)} more for free shipping.`}</p>
       </aside>
       <Link className="sa-checkout-back" href="/cart"><ArrowLeft size={14}/> Back to shopping bag</Link>

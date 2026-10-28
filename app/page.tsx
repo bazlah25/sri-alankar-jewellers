@@ -105,7 +105,7 @@ export default function HomePage() {
           <p className="eyebrow">SRI ALANKAR JEWELLERS</p>
           <h1>Exclusive Jewels,<br /><em>Exclusive You.</em></h1>
           <p className="hero-description">Timeless pieces for everyday moments,<br className="desktop-break" /> special milestones, and everything in between.</p>
-          <div className="home-hero-actions"><a className="button button-dark" href="#signature">SHOP THE COLLECTION <ArrowRight size={16}/></a><Link className="home-track-link" href="/track">TRACK YOUR ORDER <ArrowRight size={15}/></Link></div>
+          <div className="home-hero-actions"><a className="button button-dark" href="#signature">SHOP THE COLLECTION <ArrowRight size={16}/></a></div>
         </div>
         <p className="hero-script">More than<br />Jewellery ♡</p>
       </section>

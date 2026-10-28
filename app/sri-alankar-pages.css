@@ -367,6 +367,14 @@
 .sa-checkout-totals .sa-checkout-grand-total { padding-top: 13px; border-top: 1px solid #e4dcc9; color: #111c32; font-size: 13px; }
 .sa-checkout-grand-total strong { font-size: 15px; }
 .sa-checkout-shipping-note { margin: 13px 0 0; padding: 10px; background: #fffdf8; color: #626c7d; font-size: 9px; line-height: 1.5; text-align: center; }
+.sa-coupon-box { margin-top: 18px; padding: 13px; border: 1px solid #e2dac8; background: #fffdf8; }
+.sa-coupon-box > label { display: block; margin-bottom: 8px; color: #111c32; font-size: 10px; }
+.sa-coupon-box > div { display: flex; min-height: 39px; border: 1px solid #e2dac8; }
+.sa-coupon-box input { width: 100%; min-width: 0; padding: 0 10px; border: 0; outline: 0; background: transparent; color: #111c32; font-size: 11px; }
+.sa-coupon-box button { flex: 0 0 auto; padding: 0 12px; border: 0; border-left: 1px solid #e2dac8; background: #f5f1e6; color: #0b1f4a; font-size: 9px; letter-spacing: .7px; cursor: pointer; }
+.sa-coupon-box button:disabled { opacity: .55; cursor: not-allowed; }
+.sa-coupon-box > p { margin: 8px 0 0; color: #98564d; font-size: 10px; }
+.sa-coupon-box > p.success { color: #42735d; }
 .sa-checkout-back { grid-column: 1; display: inline-flex; align-items: center; gap: 7px; color: #0b1f4a; font-size: 10px; text-decoration: underline; text-underline-offset: 4px; }
 .sa-checkout-success { max-width: 520px; min-height: 310px; margin: 0 auto; padding: 40px 20px 65px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
 .sa-checkout-success h2 { margin: 0; color: #111c32; font: 400 38px "Playfair Display",Georgia,serif; }
@@ -570,6 +578,14 @@
 .sa-admin-order-item-info { display: grid; gap: 4px; min-width: 0; }
 .sa-admin-order-item-info strong { overflow: hidden; color: #243250; font-size: 10px; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
 .sa-admin-order-item-price { color: #182642; font-size: 10px; font-weight: 500; white-space: nowrap; }
+.sa-admin-coupons-layout { display: grid; grid-template-columns: minmax(320px,.8fr) minmax(0,1.2fr); gap: 20px; }
+.sa-admin-coupon-form, .sa-admin-coupon-list { min-width: 0; }
+.sa-admin-coupon-row { display: grid; grid-template-columns: minmax(0,1fr) auto auto; align-items: center; gap: 12px; padding: 16px 20px; border-top: 1px solid #e8dfcf; }
+.sa-admin-coupon-row > div { display: grid; gap: 4px; }
+.sa-admin-coupon-row strong { color: #111c32; font: 500 17px "Playfair Display",Georgia,serif; letter-spacing: .6px; }
+.sa-admin-coupon-row span, .sa-admin-coupon-row small { color: #747e8e; font-size: 10px; }
+.sa-admin-coupon-row > button:not(.sa-admin-delete) { padding: 7px 10px; border: 1px solid #d9d1c1; background: #f5f1e6; color: #747e8e; font-size: 9px; letter-spacing: .5px; cursor: pointer; }
+.sa-admin-coupon-row > button.active { border-color: #8aa18f; color: #42735d; }
 .sa-admin-order-status { display: flex; align-items: center; gap: 8px; color: #747e8e; font-size: 9px; }
 .sa-admin-order-status select { min-height: 28px; padding: 4px 25px 4px 8px; border: 1px solid #e2dac8; background: #fffdf8; color: #182642; font-size: 9px; }
 .sa-admin-order-row > strong { flex: 0 0 auto; }
@@ -810,6 +826,8 @@
   .sa-admin-toast { right: 12px; bottom: 12px; left: 12px; justify-content: center; }
 }
 @media (max-width: 700px) {
+  .sa-admin-coupons-layout { grid-template-columns: 1fr; }
+  .sa-admin-coupon-row { grid-template-columns: minmax(0,1fr) auto auto; gap: 7px; padding: 12px; }
   .sa-basket-heading { padding: 34px 4% 18px; }
   .sa-basket-layout { grid-template-columns: 1fr; padding: 5px 4% 42px; gap: 28px; }
   .sa-basket-item { grid-template-columns: 82px minmax(0,1fr) auto; gap: 12px; }
