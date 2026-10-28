@@ -44,7 +44,7 @@ export function SiteHeader() {
             {[['All', '/jewellery'], ['Necklace', '/jewellery/necklaces'], ['Earrings', '/jewellery/earrings'], ['Rings', '/jewellery/rings'], ['Bracelets', '/jewellery/bracelets'], ['Photo Frames', '/jewellery/photo-frames'], ['Pooja Essentials', '/jewellery/pooja-essentials']].map(([label, href]) => <Link role="menuitem" key={label} href={href} onClick={() => { setJewelleryOpen(false); setMenuOpen(false); }}>{label}</Link>)}
           </div>}
         </div>
-        <Link href="/collections" onClick={() => setMenuOpen(false)}>Collections</Link><Link href="/gifts" onClick={() => setMenuOpen(false)}>Gifts</Link><Link href="/about" onClick={() => setMenuOpen(false)}>About</Link>
+        <Link href="/collections" onClick={() => setMenuOpen(false)}>Collections</Link><Link href="/gifts" onClick={() => setMenuOpen(false)}>Gifts</Link><Link href="/about" onClick={() => setMenuOpen(false)}>About</Link><Link href="/track" onClick={() => setMenuOpen(false)}>Track Order</Link>
       </nav>
       <div className="header-actions">
         <button className="icon-button" aria-label="Search" onClick={() => setSearchOpen(!searchOpen)}><Search size={20}/></button>

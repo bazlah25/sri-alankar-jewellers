@@ -78,6 +78,7 @@ export default function HomePage() {
           <a href="/collections">Collections</a>
           <a href="/gifts">Gifts</a>
           <a href="/about">About</a>
+          <a href="/track" onClick={() => setMenuOpen(false)}>Track Order</a>
         </nav>
         <div className="header-actions">
           <button className="icon-button" aria-label="Search" onClick={() => setSearchOpen(!searchOpen)}><Search size={20} /></button>
