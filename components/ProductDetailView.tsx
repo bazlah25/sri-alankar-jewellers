@@ -13,6 +13,9 @@ const descriptions: Record<Product["category"], string> = {
   Earrings: "Thoughtfully finished silver earrings made to feel effortless from day to evening.",
   Rings: "A timeless silver ring with a considered shape and an easy, comfortable feel.",
   Bracelets: "A delicate silver bracelet made to be worn on its own or layered with your favourites.",
+  Bangles: "A silver bangle designed to add a graceful finishing touch to your look.",
+  Chains: "A versatile silver chain made for everyday wear and personal styling.",
+  Kadas: "A distinctive silver kada with a confident, timeless finish.",
   "Photo Frames": "A silver photo frame made to keep a favourite memory close and beautifully displayed.",
   "Pooja Essentials": "Silver pooja essentials, thoughtfully crafted for meaningful rituals and celebrations.",
 };

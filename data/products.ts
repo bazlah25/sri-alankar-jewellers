@@ -1,7 +1,7 @@
 export type Product = {
   id: string;
   name: string;
-  category: "Necklaces" | "Earrings" | "Rings" | "Bracelets" | "Photo Frames" | "Pooja Essentials";
+  category: "Necklaces" | "Earrings" | "Rings" | "Bracelets" | "Bangles" | "Chains" | "Kadas" | "Photo Frames" | "Pooja Essentials";
   gender?: "Male" | "Female" | "Unisex";
   description?: string;
   ringSizes?: string[];

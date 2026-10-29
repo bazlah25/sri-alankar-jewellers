@@ -40,8 +40,12 @@ export function SiteHeader() {
         <Link href="/new-in" onClick={() => setMenuOpen(false)}>New In</Link>
         <div className="nav-dropdown" ref={jewelleryMenuRef}>
           <button className="nav-dropdown-trigger" aria-haspopup="true" aria-expanded={jewelleryOpen} onClick={() => setJewelleryOpen(!jewelleryOpen)}>Jewellery</button>
-          {jewelleryOpen && <div className="nav-dropdown-menu" role="menu">
-            {[['All', '/jewellery'], ['Necklace', '/jewellery/necklaces'], ['Earrings', '/jewellery/earrings'], ['Rings', '/jewellery/rings'], ['Bracelets', '/jewellery/bracelets'], ['Photo Frames', '/jewellery/photo-frames'], ['Pooja Essentials', '/jewellery/pooja-essentials']].map(([label, href]) => <Link role="menuitem" key={label} href={href} onClick={() => { setJewelleryOpen(false); setMenuOpen(false); }}>{label}</Link>)}
+          {jewelleryOpen && <div className="nav-dropdown-menu sa-jewellery-menu" role="menu">
+            <Link className="sa-jewellery-all" role="menuitem" href="/jewellery" onClick={() => { setJewelleryOpen(false); setMenuOpen(false); }}>All Jewellery</Link>
+            <div className="sa-jewellery-menu-groups">
+              <div className="sa-jewellery-menu-group"><strong>Female</strong>{[["Neckpieces", "/jewellery/necklaces"], ["Bangles", "/jewellery/bangles?gender=Female"], ["Bracelets", "/jewellery/bracelets?gender=Female"], ["Earrings", "/jewellery/earrings"], ["Chains", "/jewellery/chains?gender=Female"], ["Rings", "/jewellery/rings?gender=Female"]].map(([label, href]) => <Link role="menuitem" key={`female-${label}`} href={href} onClick={() => { setJewelleryOpen(false); setMenuOpen(false); }}>{label}</Link>)}</div>
+              <div className="sa-jewellery-menu-group"><strong>Male</strong>{[["Chains", "/jewellery/chains?gender=Male"], ["Bracelets", "/jewellery/bracelets?gender=Male"], ["Rings", "/jewellery/rings?gender=Male"], ["Kadas", "/jewellery/kadas?gender=Male"]].map(([label, href]) => <Link role="menuitem" key={`male-${label}`} href={href} onClick={() => { setJewelleryOpen(false); setMenuOpen(false); }}>{label}</Link>)}</div>
+            </div>
           </div>}
         </div>
         <Link href="/collections" onClick={() => setMenuOpen(false)}>Collections</Link><Link href="/gifts" onClick={() => setMenuOpen(false)}>Gifts</Link><Link href="/about" onClick={() => setMenuOpen(false)}>About</Link><Link href="/track" onClick={() => setMenuOpen(false)}>Track Order</Link>

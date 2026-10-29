@@ -35,10 +35,21 @@ button { color: inherit; }
 .nav-dropdown-menu { position: absolute; z-index: 30; top: calc(100% + 19px); left: -14px; min-width: 175px; display: flex; flex-direction: column; padding: 8px 0; background: var(--paper); border: 1px solid var(--line); box-shadow: 0 10px 24px #00000012; }
 .nav-dropdown-menu a { padding: 10px 15px; font-size: 12px; white-space: nowrap; }
 .nav-dropdown-menu a:hover, .nav-dropdown-menu a:focus-visible { background: var(--cream); opacity: 1; }
+.sa-jewellery-menu { width: 370px; min-width: 370px; padding: 10px 0; }
+.sa-jewellery-menu .sa-jewellery-all { display: block; padding: 10px 17px 12px; border-bottom: 1px solid var(--line); font-weight: 600; }
+.sa-jewellery-menu-groups { display: grid; grid-template-columns: 1fr 1fr; }
+.sa-jewellery-menu-group { display: flex; flex-direction: column; padding: 8px 0; }
+.sa-jewellery-menu-group + .sa-jewellery-menu-group { border-left: 1px solid var(--line); }
+.sa-jewellery-menu-group strong { padding: 5px 17px 7px; color: var(--gold); font-size: 10px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; }
+.sa-jewellery-menu-group a { padding: 8px 17px; }
 @media (max-width: 650px) {
   .nav .nav-dropdown { display: flex; flex-direction: column; align-items: stretch; }
   .nav .nav-dropdown-trigger { text-align: left; font-size: 14px; }
   .nav .nav-dropdown-menu { position: static; min-width: 0; padding: 5px 0 0 12px; border: 0; box-shadow: none; background: transparent; }
+  .nav .sa-jewellery-menu { width: 100%; padding: 5px 0 0 12px; }
+  .nav .sa-jewellery-menu .sa-jewellery-all { padding: 9px 11px; }
+  .nav .sa-jewellery-menu-group a { padding: 8px 11px; }
+  .nav .sa-jewellery-menu-group strong { padding-left: 11px; }
 }
 .nav a:hover, .section-heading a:hover { opacity: .6; }
 .header-actions { display: flex; gap: 15px; align-items: center; }

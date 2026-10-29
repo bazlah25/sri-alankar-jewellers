@@ -71,8 +71,12 @@ export default function HomePage() {
           <a href="/new-in">New In</a>
           <div className="nav-dropdown" ref={jewelleryMenuRef}>
             <button className="nav-dropdown-trigger" aria-haspopup="true" aria-expanded={jewelleryOpen} onClick={() => setJewelleryOpen(!jewelleryOpen)}>Jewellery</button>
-            {jewelleryOpen && <div className="nav-dropdown-menu" role="menu">
-              {[['All', '/jewellery'], ['Necklace', '/jewellery/necklaces'], ['Earrings', '/jewellery/earrings'], ['Rings', '/jewellery/rings'], ['Bracelets', '/jewellery/bracelets'], ['Photo Frames', '/jewellery'], ['Pooja Essentials', '/jewellery']].map(([label, href]) => <a role="menuitem" key={label} href={href} onClick={() => { setJewelleryOpen(false); setMenuOpen(false); }}>{label}</a>)}
+            {jewelleryOpen && <div className="nav-dropdown-menu sa-jewellery-menu" role="menu">
+              <a className="sa-jewellery-all" role="menuitem" href="/jewellery" onClick={() => { setJewelleryOpen(false); setMenuOpen(false); }}>All Jewellery</a>
+              <div className="sa-jewellery-menu-groups">
+                <div className="sa-jewellery-menu-group"><strong>Female</strong>{[["Neckpieces", "/jewellery/necklaces"], ["Bangles", "/jewellery/bangles?gender=Female"], ["Bracelets", "/jewellery/bracelets?gender=Female"], ["Earrings", "/jewellery/earrings"], ["Chains", "/jewellery/chains?gender=Female"], ["Rings", "/jewellery/rings?gender=Female"]].map(([label, href]) => <a role="menuitem" key={`female-${label}`} href={href} onClick={() => { setJewelleryOpen(false); setMenuOpen(false); }}>{label}</a>)}</div>
+                <div className="sa-jewellery-menu-group"><strong>Male</strong>{[["Chains", "/jewellery/chains?gender=Male"], ["Bracelets", "/jewellery/bracelets?gender=Male"], ["Rings", "/jewellery/rings?gender=Male"], ["Kadas", "/jewellery/kadas?gender=Male"]].map(([label, href]) => <a role="menuitem" key={`male-${label}`} href={href} onClick={() => { setJewelleryOpen(false); setMenuOpen(false); }}>{label}</a>)}</div>
+              </div>
             </div>}
           </div>
           <a href="/collections">Collections</a>

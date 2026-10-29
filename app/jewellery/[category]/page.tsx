@@ -20,6 +20,18 @@ const categoryPages = {
     name: "Bracelets",
     subtitle: "A little silver detail to stay close, wherever you go.",
   },
+  bangles: {
+    name: "Bangles",
+    subtitle: "Silver bangles for everyday style and special moments.",
+  },
+  chains: {
+    name: "Chains",
+    subtitle: "Find a silver chain for your everyday style.",
+  },
+  kadas: {
+    name: "Kadas",
+    subtitle: "Distinctive silver kadas, made to wear your way.",
+  },
   "photo-frames": {
     name: "Photo Frames",
     subtitle: "Silver frames for the moments and people you want to keep close.",
@@ -42,8 +54,8 @@ export async function generateMetadata({ params }: { params: Promise<{ category:
   return { title: page ? `${page.name} | Sri Alankar Jewellers` : "Jewellery | Sri Alankar Jewellers" };
 }
 
-export default async function JewelleryCategoryPage({ params }: { params: Promise<{ category: string }> }) {
-  const { category } = await params;
+export default async function JewelleryCategoryPage({ params, searchParams }: { params: Promise<{ category: string }>; searchParams: Promise<{ gender?: string }> }) {
+  const [{ category }, query] = await Promise.all([params, searchParams]);
   const page = categoryPages[category as CategorySlug];
   if (!page) notFound();
   return (
@@ -59,7 +71,7 @@ export default async function JewelleryCategoryPage({ params }: { params: Promis
       </section>
       <section className="sa-page-section sa-detail-products">
         <div className="sa-section-heading"><div><span className="sa-eyebrow">MADE FOR YOUR MOMENTS</span><h2>{page.name}</h2></div></div>
-        <ProductFilters initialCategory={page.name} showCategoryPills={false}/>
+        <ProductFilters initialCategory={page.name} initialGender={query.gender === "Male" || query.gender === "Female" ? query.gender : ""} showCategoryPills={false}/>
       </section>
       <SiteFooter />
     </main>

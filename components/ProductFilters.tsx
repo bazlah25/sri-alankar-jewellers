@@ -5,7 +5,7 @@ import { SlidersHorizontal, X, ChevronDown } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
 import { useProductCatalog } from "@/components/ProductCatalogProvider";
 
-const categories = ["All", "Necklaces", "Earrings", "Rings", "Bracelets", "Photo Frames", "Pooja Essentials"];
+const categories = ["All", "Necklaces", "Earrings", "Rings", "Bracelets", "Bangles", "Chains", "Kadas", "Photo Frames", "Pooja Essentials"];
 const priceRanges = [
   { label: "Under ₹1,000", min: "", max: "999" },
   { label: "₹1,000 – ₹2,000", min: "1000", max: "2000" },
@@ -14,11 +14,11 @@ const priceRanges = [
   { label: "Above ₹5,000", min: "5001", max: "" },
 ];
 
-export default function ProductFilters({ initialCategory = "All", initialSort = "Featured", initialSearch = "", initialNewOnly = false, showCategoryPills = true }: { initialCategory?: string; initialSort?: string; initialSearch?: string; initialNewOnly?: boolean; showCategoryPills?: boolean }) {
+export default function ProductFilters({ initialCategory = "All", initialSort = "Featured", initialSearch = "", initialNewOnly = false, showCategoryPills = true, initialGender = "" }: { initialCategory?: string; initialSort?: string; initialSearch?: string; initialNewOnly?: boolean; showCategoryPills?: boolean; initialGender?: string }) {
   const { products: catalog, loaded } = useProductCatalog();
   const [category, setCategory] = useState(categories.includes(initialCategory) ? initialCategory : "All");
   const [search, setSearch] = useState(initialSearch.trim());
-  const [gender, setGender] = useState("");
+  const [gender, setGender] = useState(initialGender);
   const sortOptions = ["Featured", "Newest", "Popularity", "Price: Low to High", "Price: High to Low"];
   const [sort, setSort] = useState(sortOptions.includes(initialSort) ? initialSort : "Featured");
   const [minPrice, setMinPrice] = useState("");
@@ -32,7 +32,7 @@ export default function ProductFilters({ initialCategory = "All", initialSort = 
       (!initialNewOnly || p.isNew) &&
       (!search || [p.name, p.category, p.material, p.style, ...p.occasions].join(" ").toLocaleLowerCase().includes(search.toLocaleLowerCase())) &&
       (category === "All" || p.category === category) &&
-      (!(category === "Rings" || category === "Bracelets") || !gender || p.gender === gender || p.gender === "Unisex") &&
+      (!(category === "Rings" || category === "Bracelets" || category === "Chains" || category === "Bangles" || category === "Kadas") || !gender || p.gender === gender || p.gender === "Unisex") &&
       (minPrice === "" || p.price >= Number(minPrice)) &&
       (maxPrice === "" || p.price <= Number(maxPrice))
     );
@@ -54,7 +54,7 @@ export default function ProductFilters({ initialCategory = "All", initialSort = 
   };
   const controls = (
     <>
-      {(category === "Rings" || category === "Bracelets") && <details className="sa-filter-accordion" open><summary><span>For</span><ChevronDown aria-hidden="true" size={15}/></summary><fieldset className="sa-filter-choice-group" aria-label="Gender"><label><input type="radio" name="gender" checked={!gender} onChange={() => setGender("")}/><span>All</span></label><label><input type="radio" name="gender" checked={gender === "Male"} onChange={() => setGender("Male")}/><span>Male</span></label><label><input type="radio" name="gender" checked={gender === "Female"} onChange={() => setGender("Female")}/><span>Female</span></label></fieldset></details>}
+      {(category === "Rings" || category === "Bracelets" || category === "Chains" || category === "Bangles" || category === "Kadas") && <details className="sa-filter-accordion" open><summary><span>For</span><ChevronDown aria-hidden="true" size={15}/></summary><fieldset className="sa-filter-choice-group" aria-label="Gender"><label><input type="radio" name="gender" checked={!gender} onChange={() => setGender("")}/><span>All</span></label><label><input type="radio" name="gender" checked={gender === "Male"} onChange={() => setGender("Male")}/><span>Male</span></label><label><input type="radio" name="gender" checked={gender === "Female"} onChange={() => setGender("Female")}/><span>Female</span></label></fieldset></details>}
       <details className="sa-filter-accordion" open><summary><span>Price range</span><ChevronDown aria-hidden="true" size={15}/></summary><fieldset className="sa-filter-choice-group" aria-label="Price range">{priceRanges.map(range => <label key={range.label}><input type="radio" name="priceRange" checked={selectedPriceRange === range.label} onChange={() => selectPriceRange(range)}/><span>{range.label}</span></label>)}</fieldset><div className="sa-price-fields"><span>Custom price (₹)</span><div><input type="number" min="0" placeholder="Minimum" value={minPrice} onChange={e => { setMinPrice(e.target.value); setSelectedPriceRange(""); }}/><input type="number" min="0" placeholder="Maximum" value={maxPrice} onChange={e => { setMaxPrice(e.target.value); setSelectedPriceRange(""); }}/></div></div></details>
     </>
   );
