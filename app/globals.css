@@ -97,6 +97,12 @@ h1, h2 { font-family: "Playfair Display", Georgia, serif; font-weight: 400; lett
 .section-heading h2 { margin: 0; font-size: clamp(27px, 2.6vw, 37px); line-height: 1.1; }
 .section-heading > a { display: flex; align-items: center; gap: 7px; font-size: 10px; letter-spacing: 1.2px; font-weight: 500; white-space: nowrap; }
 .category-grid { display: grid; grid-template-columns: repeat(6, minmax(0,1fr)); gap: 12px; }
+.sa-home-category-group { margin-top: 16px; }
+.sa-home-audience-switch { display: flex; width: fit-content; gap: 7px; margin: 16px auto 0; padding: 4px; border: 1px solid var(--line); border-radius: 999px; background: #faf8f2; }
+.sa-home-audience-switch button { min-width: 116px; min-height: 38px; padding: 0 22px; border: 1px solid transparent; border-radius: 999px; background: transparent; color: var(--navy); font-size: 12px; cursor: pointer; transition: background .2s,color .2s,border-color .2s; }
+.sa-home-audience-switch button[aria-selected="true"] { background: var(--navy); color: var(--paper); }
+.sa-home-audience-switch button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.sa-home-male-category-grid { grid-template-columns: repeat(4,minmax(0,1fr)); }
 .photo { position: relative; overflow: hidden; background: #ebe5d6; }
 .photo img { object-fit: cover; transition: transform .5s ease; }
 .category-card:hover .photo img, .product-card:hover .photo img { transform: scale(1.04); }
@@ -187,6 +193,8 @@ h1, h2 { font-family: "Playfair Display", Georgia, serif; font-weight: 400; lett
   .section-heading h2 { font-size: 27px; }
   .section-heading > a { font-size: 8px; gap: 4px; }
   .category-grid { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px 9px; }
+  .sa-home-audience-switch { margin-top: 12px; }
+  .sa-home-audience-switch button { min-width: 105px; min-height: 35px; font-size: 11px; }
   .category-card .photo { aspect-ratio: .9; }
   .category-card > span { font-size: 13px; padding-top: 7px; }
   .signature { padding: 23px 0 25px; }

@@ -12,13 +12,19 @@ import {
   Menu, X, Play, Instagram, ChevronRight
 } from "lucide-react";
 
-const categories = [
-  { name: "Necklace", href: "/jewellery/necklaces", image: "/categories/necklace-category.jpg" },
+const femaleCategories = [
+  { name: "Neckpieces", href: "/jewellery/necklaces", image: "/categories/necklace-category.jpg" },
+  { name: "Bangles", href: "/jewellery/bangles?gender=Female", image: "/categories/bracelet-category.jpg" },
+  { name: "Bracelets", href: "/jewellery/bracelets?gender=Female", image: "/categories/bracelet-category.jpg" },
   { name: "Earrings", href: "/jewellery/earrings", image: "/categories/earrings-category.jpg" },
-  { name: "Rings", href: "/jewellery/rings", image: "/categories/rings-category.jpg" },
-  { name: "Bracelets", href: "/jewellery/bracelets", image: "/categories/bracelet-category.jpg" },
-  { name: "Photo Frames", href: "/jewellery/photo-frames", image: "/categories/photo-frames-category.jpg" },
-  { name: "Pooja Essentials", href: "/jewellery/pooja-essentials", image: "/categories/pooja-essentials-category.jpg" },
+  { name: "Chains", href: "/jewellery/chains?gender=Female", image: "/categories/necklace-category.jpg" },
+  { name: "Rings", href: "/jewellery/rings?gender=Female", image: "/categories/rings-category.jpg" },
+];
+const maleCategories = [
+  { name: "Chains", href: "/jewellery/chains?gender=Male", image: "/categories/necklace-category.jpg" },
+  { name: "Bracelets", href: "/jewellery/bracelets?gender=Male", image: "/categories/bracelet-category.jpg" },
+  { name: "Rings", href: "/jewellery/rings?gender=Male", image: "/categories/rings-category.jpg" },
+  { name: "Kadas", href: "/jewellery/kadas?gender=Male", image: "/categories/bracelet-category.jpg" },
 ];
 
 function Photo({ src, alt, className = "" }: { src: string; alt: string; className?: string }) {
@@ -34,6 +40,7 @@ export default function HomePage() {
   const { wishlist, toggleWishlist, cartCount, addToCart } = useShop();
   const products = catalogProducts.filter(product => product.isBestseller || product.isNew).slice(0, 5);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [categoryAudience, setCategoryAudience] = useState<"Female" | "Male">("Female");
   const [jewelleryOpen, setJewelleryOpen] = useState(false);
   const jewelleryMenuRef = useRef<HTMLDivElement>(null);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -117,15 +124,15 @@ export default function HomePage() {
       <section className="section category-section" id="categories">
         <div className="section-heading">
           <h2>Shop by Category</h2>
-          <a href="#signature">EXPLORE ALL <ArrowRight size={15}/></a>
+          <a href="/jewellery">ALL JEWELLERY <ArrowRight size={15}/></a>
         </div>
-        <div className="category-grid">
-          {categories.map(category => (
-            <a className="category-card" href={category.href} key={category.name}>
-              <Photo src={category.image} alt={category.name} />
-              <span>{category.name}</span>
-            </a>
-          ))}
+        <div className="sa-home-audience-switch" role="tablist" aria-label="Shop categories for">
+          {(["Female", "Male"] as const).map(audience => <button key={audience} type="button" role="tab" aria-selected={categoryAudience === audience} onClick={() => setCategoryAudience(audience)}>{audience}</button>)}
+        </div>
+        <div className="sa-home-category-group" role="tabpanel" aria-label={`${categoryAudience} jewellery categories`}>
+          <div className={`category-grid ${categoryAudience === "Male" ? "sa-home-male-category-grid" : ""}`}>
+            {(categoryAudience === "Female" ? femaleCategories : maleCategories).map(category => <a className="category-card" href={category.href} key={`${categoryAudience}-${category.name}`}><Photo src={category.image} alt={`${category.name} for ${categoryAudience.toLowerCase()}`} /><span>{category.name}</span></a>)}
+          </div>
         </div>
       </section>
 
